@@ -29,6 +29,16 @@ export default function ReviewPage() {
         }
     }, [category, quizData]);
 
+    // ✅ 정답 보기 키보드로 작동
+    useEffect(() => {
+        const handleKeyDown = () => {
+            if (!showAnswer) {
+                setShowAnswer(true);
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [showAnswer]);
     useEffect(() => {
         if (index >= missed.length && missed.length > 0) {
             setIndex(0);
@@ -107,18 +117,19 @@ export default function ReviewPage() {
                 ) : (
                     <div className="mt-6 flex gap-4">
                         <button
-                            onClick={handleKnow}
-                            className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors duration-300"
-                        >
-                            맞췄다
-                        </button>
-                        <button
                             onClick={handleDontKnow}
                             className="flex-1 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300"
                         >
                             또 틀림
                         </button>
+                        <button
+                            onClick={handleKnow}
+                            className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors duration-300"
+                        >
+                            맞췄다
+                        </button>
                     </div>
+
                 )}
             </div>
         </div>

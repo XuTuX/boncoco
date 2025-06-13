@@ -32,6 +32,16 @@ export default function QuizPage() {
     const total = quizData.length;
     const progressPercent = Math.round(((current + 1) / total) * 100);
 
+    // ✅ 정답 보기 키보드로 작동
+    useEffect(() => {
+        const handleKeyDown = () => {
+            if (!showAnswer) {
+                setShowAnswer(true);
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [showAnswer]);
     useEffect(() => {
         if (!allQuizData.length && category) {
             alert("해당 카테고리에 데이터가 없습니다.");
@@ -127,18 +137,19 @@ export default function QuizPage() {
                 ) : (
                     <div className="mt-6 flex gap-4">
                         <button
-                            onClick={handleKnow}
-                            className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors duration-300"
-                        >
-                            안다
-                        </button>
-                        <button
                             onClick={handleDontKnow}
                             className="flex-1 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300"
                         >
                             모른다
                         </button>
+                        <button
+                            onClick={handleKnow}
+                            className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors duration-300"
+                        >
+                            안다
+                        </button>
                     </div>
+
                 )}
             </div>
         </div>
