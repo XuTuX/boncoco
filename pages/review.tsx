@@ -3,18 +3,22 @@ import { useState, useEffect } from 'react';
 import { quizByCategory } from '../data/questions';
 import QuizCard from '../components/QuizCard';
 
+function shuffleArray<T>(array: T[]): T[] {
+    return [...array].sort(() => Math.random() - 0.5);
+}
+
 export default function ReviewPage() {
     const router = useRouter();
     const category = router.query.category as string;
 
     const quizData = category && quizByCategory[category] ? quizByCategory[category] : [];
 
-    const initialMissed = (router.query.missed as string)
+    const initialMissedRaw = (router.query.missed as string)
         ?.split(',')
         .map(Number)
         .filter((n) => !isNaN(n) && n >= 0 && n < quizData.length) || [];
 
-    const [missed, setMissed] = useState<number[]>(initialMissed);
+    const [missed, setMissed] = useState<number[]>(shuffleArray(initialMissedRaw)); // ✅ 랜덤화
     const [index, setIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
 
@@ -35,15 +39,14 @@ export default function ReviewPage() {
     const q = quizData[currentIndex];
 
     useEffect(() => {
-        // q가 undefined일 경우 잘못된 인덱스를 제거하고 다시 시작
         if (q === undefined && missed.length > 0) {
             const validMissed = missed.filter((i) => i >= 0 && i < quizData.length);
-            setMissed(validMissed);
+            setMissed(shuffleArray(validMissed)); // ✅ 잘못된 인덱스 제거 후 다시 셔플
             setIndex(0);
         }
     }, [q, missed, quizData]);
 
-    if (!initialMissed.length) {
+    if (!initialMissedRaw.length) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-6">
                 <p className="text-white text-2xl font-bold bg-white/20 p-8 rounded-lg shadow-xl">오답이 없습니다! 🎉</p>
@@ -64,7 +67,6 @@ export default function ReviewPage() {
             </div>
         );
     }
-
 
     if (!q) {
         return (

@@ -3,6 +3,10 @@ import { useRouter } from "next/router";
 import { quizByCategory } from "../data/questions";
 import QuizCard from "../components/QuizCard";
 
+function shuffleArray<T>(array: T[]): T[] {
+    return [...array].sort(() => Math.random() - 0.5);
+}
+
 export default function QuizPage() {
     const router = useRouter();
     const { category, missedOnly } = router.query;
@@ -19,11 +23,8 @@ export default function QuizPage() {
                 ? quizByCategory[category] || []
                 : [];
 
-    const quizData =
-        missedOnly === "true"
-            ? missedList.map((i) => allQuizData[i]).filter(Boolean)
-            : allQuizData;
-
+    const [quizData, setQuizData] = useState<{ question: string; answer: string }[]>([]);
+    const [modeSelected, setModeSelected] = useState(false); // ✅
     const [current, setCurrent] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [missed, setMissed] = useState<number[]>([]);
@@ -32,30 +33,36 @@ export default function QuizPage() {
     const progressPercent = Math.round(((current + 1) / total) * 100);
 
     useEffect(() => {
-        if (!quizData.length && category) {
+        if (!allQuizData.length && category) {
             alert("해당 카테고리에 데이터가 없습니다.");
             router.push("/");
         }
-    }, [category, quizData]);
+    }, [category, allQuizData]);
+
+    const handleModeSelect = (mode: "random" | "ordered") => {
+        const selectedData =
+            missedOnly === "true"
+                ? missedList.map((i) => allQuizData[i]).filter(Boolean)
+                : allQuizData;
+
+        const finalData = mode === "random" ? shuffleArray(selectedData) : selectedData;
+        setQuizData(finalData);
+        setModeSelected(true);
+    };
 
     const handleKnow = () => {
         setShowAnswer(false);
         if (current + 1 < total) {
             setCurrent(current + 1);
         } else {
-            // 모든 문제를 푼 경우
             if (missed.length === 0) {
-                router.push("/"); // 오답 없으면 홈으로
+                router.push("/");
             } else {
-                const baseQuery: { category: string | string[] | undefined; missed: string } = {
+                const baseQuery = {
                     category,
                     missed: missed.join(","),
                 };
-
-                router.push({
-                    pathname: "/review",
-                    query: baseQuery,
-                });
+                router.push({ pathname: "/review", query: baseQuery });
             }
         }
     };
@@ -64,6 +71,28 @@ export default function QuizPage() {
         setMissed([...missed, current]);
         handleKnow();
     };
+
+    if (!modeSelected) {
+        return (
+            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-purple-600 text-white px-4">
+                <h1 className="text-2xl font-bold mb-8">문제 풀기 모드 선택</h1>
+                <div className="space-y-4 w-full max-w-xs">
+                    <button
+                        onClick={() => handleModeSelect("ordered")}
+                        className="w-full py-3 bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 transition"
+                    >
+                        순서대로 풀기
+                    </button>
+                    <button
+                        onClick={() => handleModeSelect("random")}
+                        className="w-full py-3 bg-pink-500 rounded-lg font-semibold hover:bg-pink-600 transition"
+                    >
+                        랜덤으로 풀기
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (!quizData.length) return null;
 
