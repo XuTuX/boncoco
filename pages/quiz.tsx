@@ -9,46 +9,55 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export default function QuizPage() {
     const router = useRouter();
-    const { category, missedOnly } = router.query;
+    const { category, sub, missedOnly } = router.query;
 
     const missedList = (router.query.missed as string)
         ?.split(",")
         .map(Number)
         .filter((n) => !isNaN(n)) || [];
 
-    const allQuizData =
-        category === "all"
-            ? Object.values(quizByCategory).flat()
-            : category && typeof category === "string"
-                ? quizByCategory[category] || []
-                : [];
+    // ✅ 문제 데이터 구성 (2단계 구조 처리)
+    let allQuizData: { question: string; answer: string }[] = [];
+
+    if (
+        typeof category === "string" &&
+        typeof sub === "string" &&
+        quizByCategory[category]
+    ) {
+        allQuizData =
+            sub === "all"
+                ? Object.values(quizByCategory[category]).flat()
+                : quizByCategory[category][sub] || [];
+    }
 
     const [quizData, setQuizData] = useState<{ question: string; answer: string }[]>([]);
-    const [modeSelected, setModeSelected] = useState(false); // ✅
+    const [modeSelected, setModeSelected] = useState(false);
     const [current, setCurrent] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [missed, setMissed] = useState<number[]>([]);
+    const [quizCompleted, setQuizCompleted] = useState(false); // New state for quiz completion
 
     const total = quizData.length;
     const progressPercent = Math.round(((current + 1) / total) * 100);
 
-    // ✅ 정답 보기 키보드로 작동
+    // ✅ 정답 보기 - 키보드 단축키
     useEffect(() => {
         const handleKeyDown = () => {
-            if (!showAnswer) {
-                setShowAnswer(true);
-            }
+            if (!showAnswer) setShowAnswer(true);
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [showAnswer]);
+
+    // ✅ 에러 시 리디렉션
     useEffect(() => {
-        if (!allQuizData.length && category) {
+        if (!allQuizData.length && category && sub) {
             alert("해당 카테고리에 데이터가 없습니다.");
             router.push("/");
         }
-    }, [category, allQuizData]);
+    }, [category, sub, allQuizData]);
 
+    // ✅ 모드 선택 (순서대로 / 랜덤)
     const handleModeSelect = (mode: "random" | "ordered") => {
         const selectedData =
             missedOnly === "true"
@@ -65,14 +74,18 @@ export default function QuizPage() {
         if (current + 1 < total) {
             setCurrent(current + 1);
         } else {
+            // Quiz completed
             if (missed.length === 0) {
-                router.push("/");
+                setQuizCompleted(true); // Set quizCompleted to true
             } else {
-                const baseQuery = {
-                    category,
-                    missed: missed.join(","),
-                };
-                router.push({ pathname: "/review", query: baseQuery });
+                router.push({
+                    pathname: "/review",
+                    query: {
+                        category,
+                        sub,
+                        missed: missed.join(","),
+                    },
+                });
             }
         }
     };
@@ -81,6 +94,18 @@ export default function QuizPage() {
         setMissed([...missed, current]);
         handleKnow();
     };
+
+    // --- MODIFIED handleGoHome function ---
+    const handleGoHome = () => {
+        // Ensure category is a string before encoding
+        if (typeof category === 'string') {
+            router.push(`/${encodeURIComponent(category)}`);
+        } else {
+            // Fallback if category is not available, though it should be
+            router.push("/");
+        }
+    };
+    // --- END MODIFIED handleGoHome function ---
 
     if (!modeSelected) {
         return (
@@ -100,6 +125,22 @@ export default function QuizPage() {
                         랜덤으로 풀기
                     </button>
                 </div>
+            </div>
+        );
+    }
+
+    // Display "Well Done!" message when quiz is completed with no missed questions
+    if (quizCompleted) {
+        return (
+            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-green-500 to-teal-600 text-white px-4">
+                <h1 className="text-3xl font-bold mb-6">🎉 잘했어요! 🎉</h1>
+                <p className="text-lg mb-8 text-center">모든 문제를 완벽하게 풀었어요!</p>
+                <button
+                    onClick={handleGoHome}
+                    className="w-full max-w-xs py-3 bg-white text-green-700 font-bold rounded-lg shadow-md hover:bg-gray-100 transition-colors duration-300"
+                >
+                    홈으로 돌아가기
+                </button>
             </div>
         );
     }
@@ -149,7 +190,6 @@ export default function QuizPage() {
                             안다
                         </button>
                     </div>
-
                 )}
             </div>
         </div>
