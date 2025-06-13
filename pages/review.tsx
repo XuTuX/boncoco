@@ -46,15 +46,24 @@ export default function ReviewPage() {
     }, [category, sub, quizData]);
 
     // ✅ 키보드 단축키
+    // ✅ 키보드 단축키
     useEffect(() => {
-        const handleKeyDown = () => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (!showAnswer) {
                 setShowAnswer(true);
+            } else {
+                if (e.key === "ArrowRight") {
+                    handleKnow(); // 맞췄다
+                } else if (e.key === "ArrowLeft") {
+                    handleDontKnow(); // 또 틀림
+                }
             }
         };
+
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [showAnswer]);
+    }, [showAnswer, index, missed]);
+
 
     useEffect(() => {
         if (index >= missed.length && missed.length > 0) {

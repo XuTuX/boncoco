@@ -32,7 +32,8 @@ export default function SubCategoryPage() {
                             key={sub}
                             href={`/quiz?category=${encodeURIComponent(major)}&sub=${encodeURIComponent(sub)}`}
                         >
-                            <button className="aspect-square w-full bg-blue-600 text-white text-xs font-medium rounded-2xl shadow hover:bg-blue-700 transition flex items-center justify-center text-center px-2">
+                            <button className="aspect-square w-full bg-blue-600 text-white text-m font-semibold
+                             rounded-2xl shadow hover:bg-blue-700 transition flex items-center justify-center text-center px-2">
                                 {sub}
                             </button>
                         </Link>

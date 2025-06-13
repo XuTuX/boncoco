@@ -42,12 +42,23 @@ export default function QuizPage() {
 
     // ✅ 정답 보기 - 키보드 단축키
     useEffect(() => {
-        const handleKeyDown = () => {
-            if (!showAnswer) setShowAnswer(true);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!showAnswer) {
+                // 정답 보기 먼저
+                setShowAnswer(true);
+            } else {
+                if (e.key === "ArrowRight") {
+                    handleKnow();      // 오른쪽 → 키는 "안다"
+                } else if (e.key === "ArrowLeft") {
+                    handleDontKnow();  // 왼쪽 ← 키는 "모른다"
+                }
+            }
         };
+
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [showAnswer]);
+    }, [showAnswer, current, quizData, missed]); // 필요한 state들을 의존성에 넣어줌
+
 
     // ✅ 에러 시 리디렉션
     useEffect(() => {
