@@ -71,7 +71,7 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "38도 이하의 미열이 지속되는 것의 원인", "answer": "노권상(勞倦傷), 음허증, 기허증" }
     ],
     "땀의 문진": [
-        { "question": "표증에서 땀이 나지 않는 경우", "answer": "표실증(表實證)" },
+        { "question": "표증에서 땀이 나지 않는 경우", "answer": "표한실증(表寒實證)" },
         { "question": "표증에서 땀이 나는 경우", "answer": "표허증(表虛證) 또는 표열증(表熱證)" },
         { "question": "리증에서 땀이 나지 않는 원인", "answer": "진액부족 陰血虧虛 또는 양기허" },
         { "question": "특별한 활동 없이도 땀이 나는 증상", "answer": "자한(自汗)" },
