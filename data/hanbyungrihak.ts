@@ -21,6 +21,11 @@ export const hanbyungrihak: { [key: string]: { question: string; answer: string 
             "answer": "음저(陰疽)이다."
         },
         {
+            "question": "온보(溫補) 하여 치료하는 것은?  (객관식)",
+            "answer": "음저(陰疽)이다."
+        },
+
+        {
             "question": "굴신불리(屈伸不利)를 의미하는 병기십구조(病機十九條)의 증상은 무엇인가? (객관식)",
             "answer": "수인(收引)이다."
         },
@@ -155,8 +160,17 @@ export const hanbyungrihak: { [key: string]: { question: string; answer: string 
             "question": "澁枯涸 乾勁皴揭 병리적 상태를 나타내는 단어의 의미를 묻는 문제. (객관식)",
             "answer": "枯: 영양분이 공급되지 않아서 마른 것 (不榮生) -涸: 水液이 없는 것 (無水液) -乾: 촉촉하게 적셔지지 않은 것 (不滋潤) -勁: 부드럽지 않은 것 (不柔和) -皴揭: 피부가 트고 갈라지는 것 (皮膚啓裂)"
         },
+        {
+            "question": "周學海(주학해)의《讀醫隨筆》에서의 升降出⼊ 설명 틀린것 (객관식)",
+            "answer": "인신의 근본"
+        },
     ],
     "30-31강_장부병기": [
+        {
+            "question": "陰陽이 相搏(상박)하고 (   )가 相合하여 主客이 相引(상인)함으로써 變作",
+            "answer": " 內外 "
+        },
+
         {
             "question": "호흡미세(呼吸微細)에 해당하는 것은 무엇인가? (객관식)",
             "answer": "폐허(肺虚)이다."
@@ -206,6 +220,15 @@ export const hanbyungrihak: { [key: string]: { question: string; answer: string 
             "answer": " 인문(咽門) 있었다."
         },
         {
+            "question": "비의 외증이 아닌것은? (객관식)",
+            "answer": " 善美(선미) - 트림"
+        },
+        {
+            "question": "양편승의 병증 (객관식)",
+            "answer": "실열 및 음진허손"
+        },
+
+        {
             "question": "소장(小腸)의 병증에 해당하는 증상을 고르는 문제. (객관식)",
             "answer": "소복통(小腹痛), 요척공고이통(腰脊控睾而痛), 시군지후(時窘之候), 당이전열(當耳前熱) 등이다."
         },
@@ -214,9 +237,21 @@ export const hanbyungrihak: { [key: string]: { question: string; answer: string 
             "answer": "순서대로 소복(小腹), 소변(小便), 경중(莖中)이다."
         },
         {
+            "question": "기허증상이 아닌 것  (객관식 채우기)",
+            "answer": "분돈/ 애역 - 기역증상"
+        },
+        {
+            "question": " 小腸有( )則 小腹痛, 小腸有( )則 小便澁 小腸有( )則 莖中痛",
+            "answer": "氣, 血, 熱"
+        },
+        {
             "question": "'善太息 口苦 嘔有苦汁 心中澹澹 恐如人將捕之 嗌中哈哈然 數唾'는 무엇에 대한 설명인가? (객관식)",
             "answer": "담병증(膽病證)이다."
-        }
+        },
+        {
+            "question": " 오장법 치법중 폐에 해당하는 것은? ",
+            "answer": "急食苦以泄之, 急食酸以收之"
+        },
     ],
     "32강_장부전변론": [
         {
