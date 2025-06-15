@@ -4,22 +4,7 @@ import { useMemo, useState } from "react";
 
 type QA = { question: string; answer: string };
 
-// ─── 화살표 아이콘 ───────────────────────────
-const ChevronIcon = ({ open }: { open: boolean }) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`h-5 w-5 transform text-gray-500 transition-transform duration-200 ${open ? "rotate-90" : ""
-            }`}
-        viewBox="0 0 20 20"
-        fill="currentColor"
-    >
-        <path
-            fillRule="evenodd"
-            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-            clipRule="evenodd"
-        />
-    </svg>
-);
+
 
 // ─── 메인 컴포넌트 ───────────────────────────
 export default function AnswerSheet() {
@@ -65,7 +50,7 @@ export default function AnswerSheet() {
 
     const goToQuizUnknown = () => {
         const unknownIdxs = Object.entries(unknown)
-            .filter(([, v]) => v)          // ← key를 쓰지 않으므로 빈 자리로 처리
+            .filter(([, v]) => v)
             .map(([k]) => k)
             .join(",");
         if (!unknownIdxs) {
@@ -124,25 +109,32 @@ export default function AnswerSheet() {
                             <div
                                 key={idx}
                                 className={`
-                  flex items-start gap-4 rounded-xl p-4 sm:p-6 shadow-sm
-                  border-l-4 transition-all duration-300
-                  ${unknown[idx]
+                                    flex items-start gap-4 rounded-xl p-4 sm:p-6 shadow-sm
+                                    border-l-4 transition-all duration-300
+                                    ${unknown[idx]
                                         ? "border-red-400 bg-red-50/60"
                                         : "border-transparent bg-white"
                                     }
-                `}
+                                `}
                             >
                                 {/* 질문/답변 */}
                                 <div className="flex-1">
+                                    {/* ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ */}
+                                    {/* button에 hover 효과, 패딩, 음수 마진을 추가하여 클릭 영역을 시각화 */}
                                     <button
                                         onClick={() => setOpen((o) => ({ ...o, [idx]: !o[idx] }))}
-                                        className="flex w-full items-center gap-2 text-left text-lg font-semibold text-gray-800"
+                                        className="
+                                            -m-2 flex w-full items-center justify-between
+                                            rounded-lg p-2 text-left
+                                            transition-colors hover:bg-gray-100/70
+                                        "
                                     >
-                                        <ChevronIcon open={!!open[idx]} />
-                                        <span>
+                                        <span className="pr-4 text-lg font-semibold text-gray-800">
                                             {idx + 1}. {qa.question}
                                         </span>
+
                                     </button>
+                                    {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
 
                                     {open[idx] && (
                                         <p className="mt-4 animate-[fadeIn_0.3s_ease-out] rounded-lg bg-slate-100 p-4 font-medium text-green-800">
