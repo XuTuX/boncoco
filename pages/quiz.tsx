@@ -35,8 +35,6 @@ export default function QuizPage() {
     const [current, setCurrent] = useState(0)
     const [showAnswer, setShowAnswer] = useState(false)
     const [wrongSet, setWrongSet] = useState<QA[]>([])
-    const [canPressKey, setCanPressKey] = useState(true)
-
     useEffect(() => {
         if (!allData.length && category && rawSub) {
             alert("해당 카테고리에 데이터가 없습니다.")
@@ -51,16 +49,6 @@ export default function QuizPage() {
         setQuizData(final)
         setPhase("learn")
     }, [allData, modeParam, phase])
-
-    useEffect(() => {
-        if (showAnswer) {
-            setCanPressKey(false)
-            const timeout = setTimeout(() => {
-                setCanPressKey(true)
-            }, 100) // 100ms
-            return () => clearTimeout(timeout)
-        }
-    }, [showAnswer])
 
 
     const know = useCallback(() => {
