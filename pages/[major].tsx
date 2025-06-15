@@ -168,18 +168,6 @@ export default function SubCategoryPage() {
 
                         {/* 3-4. 하단 버튼 */}
                         <div className="flex gap-6">
-                            <Button
-                                disabled={!isActive}
-                                size="lg"
-                                onClick={() => start("quiz")}
-                                className={`flex-1 h-14 text-lg font-semibold transition transform duration-200 ${isActive
-                                    ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg hover:shadow-xl hover:scale-105"
-                                    : "bg-slate-200 text-slate-400 cursor-not-allowed"
-                                    }`}
-                            >
-                                <Play className="mr-2 h-5 w-5" />
-                                테스트 시작
-                            </Button>
 
                             <Button
                                 disabled={!isActive}
@@ -193,6 +181,20 @@ export default function SubCategoryPage() {
                                 <BookOpen className="mr-2 h-5 w-5" />
                                 학습하기
                             </Button>
+                            <Button
+                                disabled={!isActive}
+                                size="lg"
+                                onClick={() => start("quiz")}
+                                className={`flex-1 h-14 text-lg font-semibold transition transform duration-200 ${isActive
+                                    ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg hover:shadow-xl hover:scale-105"
+                                    : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                    }`}
+                            >
+                                <Play className="mr-2 h-5 w-5" />
+                                테스트 시작
+                            </Button>
+
+
                         </div>
 
                     </CardContent>

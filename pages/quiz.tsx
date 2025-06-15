@@ -35,6 +35,7 @@ export default function QuizPage() {
     const [current, setCurrent] = useState(0)
     const [showAnswer, setShowAnswer] = useState(false)
     const [wrongSet, setWrongSet] = useState<QA[]>([])
+    const [canPressKey, setCanPressKey] = useState(true)
 
     useEffect(() => {
         if (!allData.length && category && rawSub) {
@@ -50,6 +51,17 @@ export default function QuizPage() {
         setQuizData(final)
         setPhase("learn")
     }, [allData, modeParam, phase])
+
+    useEffect(() => {
+        if (showAnswer) {
+            setCanPressKey(false)
+            const timeout = setTimeout(() => {
+                setCanPressKey(true)
+            }, 100) // 100ms
+            return () => clearTimeout(timeout)
+        }
+    }, [showAnswer])
+
 
     const know = useCallback(() => {
         setShowAnswer(false)
@@ -74,10 +86,14 @@ export default function QuizPage() {
     useEffect(() => {
         if (phase !== "learn") return
         const onKey = (e: KeyboardEvent) => {
-            if (!showAnswer) setShowAnswer(true)
-            else if (e.key === "ArrowRight") know()
-            else if (e.key === "ArrowLeft") dont()
+            if (!showAnswer) {
+                setShowAnswer(true)
+            } else if (canPressKey) {
+                if (e.key === "ArrowRight") know()
+                else if (e.key === "ArrowLeft") dont()
+            }
         }
+
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
     }, [phase, showAnswer, know, dont])
