@@ -136,7 +136,7 @@ export default function AnswerSheet() {
                                     </button>
                                     {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
 
-                                    {open[idx] && (
+                                    {(open[idx] || unknown[idx]) && (
                                         <p className="mt-4 animate-[fadeIn_0.3s_ease-out] rounded-lg bg-slate-100 p-4 font-medium text-green-800">
                                             {qa.answer}
                                         </p>
