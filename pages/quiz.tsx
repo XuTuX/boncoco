@@ -57,7 +57,8 @@ export default function QuizPage() {
         const missedIdxList = (router.query.missed as string | undefined)
             ?.split(",")
             .map(Number)
-            .filter((n) => !isNaN(n) && allData[n]);
+            .filter((n) => !isNaN(n) && n >= 0 && n < allData.length)
+
 
         const base: QA[] = missedOnly === "true" && missedIdxList?.length
             ? missedIdxList.map((i) => allData[i])
@@ -69,20 +70,33 @@ export default function QuizPage() {
     };
 
     // ↓  existing hooks 근처에 추가
+    // ────────────────────────────────────────────
+    // 4️⃣  모드(순서/랜덤) 선택 : 키보드 지원 추가
+    // ────────────────────────────────────────────
     useEffect(() => {
         if (phase !== "select") return;
+
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "ArrowLeft") handleModeSelect("ordered"); // ← 순서
-            if (e.key === "ArrowRight") handleModeSelect("random");  // → 랜덤
+            if (e.key === "ArrowRight") {
+                // 👉 순서대로 풀기
+                handleModeSelect("ordered");
+            }
+            if (e.key === "ArrowLeft") {
+                // 👉 랜덤으로 풀기
+                handleModeSelect("random");
+            }
         };
+
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [phase]);
+    }, [phase, handleModeSelect]);
+
 
 
     // ────────────────────────────────────────────
     // 5️⃣  학습 로직 (알아요/몰라요)
     // ────────────────────────────────────────────
+    // 안전하게 quizData 자체를 의존성에 추가
     const know = useCallback(() => {
         setShowAnswer(false);
         if (current + 1 >= quizData.length) {
@@ -90,13 +104,16 @@ export default function QuizPage() {
         } else {
             setCurrent((i) => i + 1);
         }
-    }, [current, quizData.length]);
+    }, [current, quizData]);
 
     const dont = useCallback(() => {
         const item = quizData[current];
-        setWrongSet((prev) => (prev.some((q) => q.question === item.question) ? prev : [...prev, item]));
+        setWrongSet((prev) =>
+            prev.some((q) => q.question === item.question) ? prev : [...prev, item]
+        );
         know();
     }, [current, quizData, know]);
+
 
     // ────────────────────────────────────────────
     // 6️⃣  키보드 단축키
