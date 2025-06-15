@@ -1,5 +1,5 @@
 export const hanbyungrihak: { [key: string]: { question: string; answer: string }[] } = {
-    "25-27강_병기론_개설_및_병기십구조": [
+    "병기십구조": [
         {
             "question": "병인(因), 증상(症), 부위(位)를 모두 포함하는 병기십구조(病機十九條)는 무엇인가? (객관식/써머리)",
             "answer": "오장병기(五臟病機)이다."
