@@ -163,7 +163,10 @@ export default function QuizPage() {
                     <>
                         <h1 className="text-2xl font-bold">📋 오답 노트</h1>
                         <ul className="bg-white/10 rounded-xl p-6 space-y-2 max-w-xl w-full text-left overflow-y-auto max-h-[60vh]">
-                            {wrongSet.map((q) => (<li key={q.question} className="text-white/90">• {q.question}</li>))}
+                            {wrongSet.map((q, idx) => (<li key={idx} className="text-white/90 space-y-1">
+                                <div className="font-semibold">Q. {q.question}</div>
+                                <div className="text-green-300">A. {q.answer}</div>
+                            </li>))}
                         </ul>
                         <button onClick={retryWrongSet} className="px-6 py-3 bg-red-100 text-red-700 font-semibold rounded-lg hover:bg-red-200 transition">오답만 다시 풀기</button>
                     </>
