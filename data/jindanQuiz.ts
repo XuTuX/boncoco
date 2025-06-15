@@ -43,12 +43,12 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "입에서 계란 썩는 냄새가 나는 경우 의심 질환", "answer": "만성 간염, 간경변" },
         { "question": "입에서 암모니아 냄새가 나는 경우 의심 질환", "answer": "신장기능 이상" },
         { "question": "생선비린내", "answer": "폐옹" },
-        { "question": "썩은 냄새, 기침시 농혈을 토함", "answer": "농양" },
+        { "question": "썩은 냄새", "answer": "농양, 기침시 농혈을 토함" },
         { "question": "배란일 전후 48시간에 나는 입 냄새", "answer": "황체 호르몬 분비에 의한 생리적 현상" }
     ],
     "병실의 냄새": [
         { "question": "병실에서 피비린내가 나는 경우", "answer": "환자의 출혈" },
-        { "question": "고약하고 부패한 냄새 ", "answer": "병세 위증 " },
+        { "question": "병실에서 고약하고 부패한 냄새 ", "answer": "병세 위증 " },
         { "question": "병실에서 썩은내가 나는 경우", "answer": "창양이 극심" },
         { "question": "병실에서 소변 지린내 나는 경우", "answer": "신쇠나 수종이 심한" },
         { "question": "병실에서 썩은 사과 냄새가 나는 경우", "answer": "소갈(消渴)" },
@@ -64,6 +64,8 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "39도 이상의 고열과 땀이 특징인 리실열증(裏實熱證)의 발열", "answer": "장열(壯熱)" },
         { "question": "오후나 야간에 심해지는 음허(陰虛)로 인한 발열", "answer": "음허조열(陰虛潮熱)" },
         { "question": "오후 3-5시경에 심해지는 양명부실증의 발열", "answer": "일포조열(日晡潮熱)" },
+        { "question": "지그시 누르면 열이 많이 느껴짐, 오후에 심함, 습온병", "answer": "습온조열(日晡潮熱)" },
+        { "question": "미열이 지속, 노권상", "answer": "장기저열( 長期低熱)" },
         { "question": "전한 후 발열이 소실되며 맥이 완만해짐", "answer": "회복되는 전환점" },
         { "question": "전한 후 발열이 심해지며 맥이 급·질(急·疾)해짐", "answer": "병이 악화되는 전환점" },
         { "question": "38도 이하의 미열이 지속되는 것의 원인", "answer": "노권상(勞倦傷), 음허증, 기허증" }
