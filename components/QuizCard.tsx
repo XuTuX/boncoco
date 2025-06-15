@@ -23,7 +23,7 @@ export default function QuizCard({ question, answer, showAnswer }: QuizCardProps
             {showAnswer && (
                 <div className="mt-auto">
                     <p className="text-gray-800 font-semibold text-xl tracking-wide">
-                        정답: <span className="text-green-600 text-2xl tracking-wider">{answer}</span>
+                        정답: <span className="text-green-600 text-xl tracking-wider">{answer}</span>
                     </p>
                 </div>
             )}

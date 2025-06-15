@@ -14,7 +14,9 @@ type Phase = "select" | "learn" | "done"
 
 export default function QuizPage() {
     const router = useRouter()
-    const { category, sub: rawSub, mode } = router.query
+    // onlyUnknown: "0,2,5" 같은 인덱스 리스트가 이 안으로 넘어옴
+    const { category, sub: rawSub, mode, onlyUnknown } = router.query
+
 
     const modeParam: "ordered" | "random" =
         Array.isArray(mode) ? "ordered" : mode === "random" ? "random" : "ordered"
@@ -30,6 +32,20 @@ export default function QuizPage() {
             .flatMap((s) => group[s] ?? [])
     }, [category, rawSub])
 
+    // 2) onlyUnknown이 있으면, 해당 인덱스의 문제만 필터링
+    const filteredData: QA[] = useMemo(() => {
+        if (typeof onlyUnknown !== "string" || !onlyUnknown) {
+            return allData
+        }
+        // "0,2,5" → [0,2,5], NaN 필터링
+        const idxs = onlyUnknown
+            .split(",")
+            .map(n => parseInt(n, 10))
+            .filter(n => !isNaN(n) && n >= 0 && n < allData.length)
+        return idxs.map(i => allData[i])
+    }, [allData, onlyUnknown])
+
+
     const [phase, setPhase] = useState<Phase>("select")
     const [quizData, setQuizData] = useState<QA[]>([])
     const [current, setCurrent] = useState(0)
@@ -44,11 +60,11 @@ export default function QuizPage() {
 
     useEffect(() => {
         if (!allData.length || phase !== "select") return
-        const base = allData
+        const base = filteredData
         const final = modeParam === "random" ? shuffle(base) : base
         setQuizData(final)
         setPhase("learn")
-    }, [allData, modeParam, phase])
+    }, [allData, modeParam, phase, filteredData])
 
 
     const know = useCallback(() => {

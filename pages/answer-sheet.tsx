@@ -4,6 +4,24 @@ import { useMemo, useState } from "react";
 
 type QA = { question: string; answer: string };
 
+// ─── 화살표 아이콘 ───────────────────────────
+const ChevronIcon = ({ open }: { open: boolean }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={`h-5 w-5 transform text-gray-500 transition-transform duration-200 ${open ? "rotate-90" : ""
+            }`}
+        viewBox="0 0 20 20"
+        fill="currentColor"
+    >
+        <path
+            fillRule="evenodd"
+            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+            clipRule="evenodd"
+        />
+    </svg>
+);
+
+// ─── 메인 컴포넌트 ───────────────────────────
 export default function AnswerSheet() {
     const router = useRouter();
     const { category, sub: rawSub, mode } = router.query;
@@ -22,15 +40,21 @@ export default function AnswerSheet() {
             .flatMap((s) => group[s] ?? []);
     }, [category, rawSub]);
 
-    const data =
-        modeParam === "random" ? [...all].sort(() => Math.random() - 0.5) : all;
+    /* 2. 랜덤 모드 */
+    const data = modeParam === "random" ? [...all].sort(() => Math.random() - 0.5) : all;
 
-    /* 2. 토글 상태 */
+    /* 3. 상태 */
     const [open, setOpen] = useState<Record<number, boolean>>({});
+    const [unknown, setUnknown] = useState<Record<number, boolean>>({});
+
+    const unknownCount = useMemo(
+        () => Object.values(unknown).filter(Boolean).length,
+        [unknown]
+    );
 
     if (!data.length) return null;
 
-    /* 3. 테스트 페이지로 이동 */
+    /* 4. 라우팅 */
     const goToQuiz = () => {
         const base =
             `category=${encodeURIComponent(String(category))}` +
@@ -39,47 +63,133 @@ export default function AnswerSheet() {
         router.push(`/quiz?${base}`);
     };
 
+    const goToQuizUnknown = () => {
+        const unknownIdxs = Object.entries(unknown)
+            .filter(([, v]) => v)          // ← key를 쓰지 않으므로 빈 자리로 처리
+            .map(([k]) => k)
+            .join(",");
+        if (!unknownIdxs) {
+            alert("먼저 모르는 문제를 체크하세요.");
+            return;
+        }
+        const base =
+            `category=${encodeURIComponent(String(category))}` +
+            `&sub=${encodeURIComponent(String(rawSub))}` +
+            `&mode=${modeParam}` +
+            `&onlyUnknown=${unknownIdxs}`;
+        router.push(`/quiz?${base}`);
+    };
+
+    /* 5. 전체 토글 */
+    const handleToggleAllAnswers = (shouldOpen: boolean) => {
+        const newState = Object.fromEntries(
+            [...data.keys()].map((idx) => [idx, shouldOpen] as const)
+        );
+        setOpen(newState);
+    };
+
+    const handleToggleAllUnknown = (shouldCheck: boolean) => {
+        const newState = Object.fromEntries(
+            [...data.keys()].map((idx) => [idx, shouldCheck] as const)
+        );
+        setUnknown(newState);
+    };
+
+    /* 6. 렌더링 */
     return (
-        <main className="min-h-screen bg-gray-100 p-6">
-            <div className="mx-auto w-full max-w-2xl space-y-6">
-                {/* 헤더 + 테스트 버튼 */}
-                <div className="flex flex-col items-center gap-4">
-                    <h1 className="text-2xl font-bold text-center">
+        <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="mx-auto flex w-full max-w-7xl flex-col lg:flex-row">
+                {/* ── 문제 리스트 ────────────────── */}
+                <div className="flex-[4] lg:pr-8">
+                    <h1 className="mb-4 text-3xl font-bold">
                         {category} – 답지 ({data.length}문제)
                     </h1>
-                </div>
-                {/* Q&A 목록 */}
-                {data.map((qa, idx) => (
-                    <div
-                        key={idx}
-                        className="rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
-                    >
-                        <button
-                            onClick={() => setOpen((o) => ({ ...o, [idx]: !o[idx] }))}
-                            className="w-full text-left font-semibold"
-                        >
-                            {idx + 1}. {qa.question}
-                        </button>
-                        {open[idx] && (
-                            <p className="mt-2 rounded-md bg-green-50 p-3 text-green-800">
-                                {qa.answer}
-                            </p>
-                        )}
+
+                    {/* 컨트롤 패널 */}
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+                        <div className="text-sm font-medium text-gray-600">
+                            <span className="font-bold text-red-500">{unknownCount}</span> / {data.length}개 모름
+                        </div>
+                        <div className="flex flex-wrap gap-2 text-sm">
+                            <button onClick={() => handleToggleAllAnswers(true)} className="rounded-md bg-gray-100 px-3 py-1.5 transition-colors hover:bg-gray-200">전체 정답 보기</button>
+                            <button onClick={() => handleToggleAllAnswers(false)} className="rounded-md bg-gray-100 px-3 py-1.5 transition-colors hover:bg-gray-200">전체 숨기기</button>
+                            <button onClick={() => handleToggleAllUnknown(true)} className="rounded-md bg-gray-100 px-3 py-1.5 transition-colors hover:bg-gray-200">모두 모름</button>
+                            <button onClick={() => handleToggleAllUnknown(false)} className="rounded-md bg-gray-100 px-3 py-1.5 transition-colors hover:bg-gray-200">모두 해제</button>
+                        </div>
                     </div>
-                ))}
 
+                    {/* 문제 목록 */}
+                    <div className="space-y-4">
+                        {data.map((qa, idx) => (
+                            <div
+                                key={idx}
+                                className={`
+                  flex items-start gap-4 rounded-xl p-4 sm:p-6 shadow-sm
+                  border-l-4 transition-all duration-300
+                  ${unknown[idx]
+                                        ? "border-red-400 bg-red-50/60"
+                                        : "border-transparent bg-white"
+                                    }
+                `}
+                            >
+                                {/* 질문/답변 */}
+                                <div className="flex-1">
+                                    <button
+                                        onClick={() => setOpen((o) => ({ ...o, [idx]: !o[idx] }))}
+                                        className="flex w-full items-center gap-2 text-left text-lg font-semibold text-gray-800"
+                                    >
+                                        <ChevronIcon open={!!open[idx]} />
+                                        <span>
+                                            {idx + 1}. {qa.question}
+                                        </span>
+                                    </button>
 
+                                    {open[idx] && (
+                                        <p className="mt-4 animate-[fadeIn_0.3s_ease-out] rounded-lg bg-slate-100 p-4 font-medium text-green-800">
+                                            {qa.answer}
+                                        </p>
+                                    )}
+                                </div>
 
-                <div className="mt-10 flex justify-center">
-                    <button
-                        onClick={goToQuiz}
-                        className="rounded-lg bg-indigo-500 px-8 py-4 font-semibold text-white shadow-md transition hover:bg-indigo-600"
-                    >
-                        테스트 시작
-                    </button>
+                                {/* 모름 체크 */}
+                                <label className="flex cursor-pointer flex-col items-center gap-2 pt-1">
+                                    <div className="relative">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!unknown[idx]}
+                                            onChange={() =>
+                                                setUnknown((u) => ({ ...u, [idx]: !u[idx] }))
+                                            }
+                                            className="peer sr-only"
+                                        />
+                                        <div className="h-6 w-11 rounded-full bg-gray-200 transition-colors peer-checked:bg-red-500"></div>
+                                        <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-full"></div>
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-600">모름</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-
+                {/* ── 사이드바 ──────────────────── */}
+                <div className="mt-8 lg:ml-8 lg:mt-0 lg:flex-[1]">
+                    <div className="sticky top-6 space-y-4 rounded-xl bg-white p-4 shadow-lg">
+                        <button
+                            onClick={goToQuiz}
+                            className="w-full rounded-lg bg-indigo-500 px-6 py-3 text-lg font-semibold text-white shadow-md transition hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            전체 테스트 시작
+                        </button>
+                        <button
+                            onClick={goToQuizUnknown}
+                            disabled={unknownCount === 0}
+                            className="w-full rounded-lg bg-red-500 px-6 py-3 text-lg font-semibold text-white shadow-md transition hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        >
+                            모르는 것만 테스트
+                        </button>
+                    </div>
+                </div>
             </div>
         </main>
     );
