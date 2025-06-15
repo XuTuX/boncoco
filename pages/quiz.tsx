@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { quizByCategory } from "../data/questions";
 import QuizCard from "../components/QuizCard";
 
-function shuffleArray<T>(array: T[]): T[] {
-    return [...array].sort(() => Math.random() - 0.5);
+function shuffle<T>(arr: T[]) {
+    return [...arr].sort(() => Math.random() - 0.5);
 }
 
 type QA = { question: string; answer: string };
@@ -12,180 +12,137 @@ type Phase = "select" | "learn" | "done";
 
 export default function QuizPage() {
     const router = useRouter();
-    const { category, sub: rawSub, missedOnly } = router.query;
+    const { category, sub: rawSub, missedOnly, mode } = router.query;
 
-    // ────────────────────────────────────────────
-    // 1️⃣ 전체 문제 데이터 계산 (다중 sub 지원)
-    // ────────────────────────────────────────────
-    const allData: QA[] = (() => {
+    /* ── 0. mode 기본값 ── */
+    const modeParam: "ordered" | "random" =
+        Array.isArray(mode) ? "ordered" : mode === "random" ? "random" : "ordered";
+
+    /* ── 1. 전체 문제 집합 (useMemo로 고정) ── */
+    const allData: QA[] = useMemo(() => {
         if (typeof category !== "string" || typeof rawSub !== "string") return [];
         const group = quizByCategory[category];
         if (!group) return [];
 
         if (rawSub === "all") return Object.values(group).flat();
+        return rawSub
+            .split(",")
+            .filter(Boolean)
+            .flatMap((s) => group[s] ?? []);
+    }, [category, rawSub]);
 
-        const subs = rawSub.split(",").filter(Boolean);
-        return subs.flatMap((s) => group[s] ?? []);
-    })();
-
-    // ────────────────────────────────────────────
-    // 2️⃣ 상태 선언
-    // ────────────────────────────────────────────
+    /* ── 2. 상태 ── */
     const [phase, setPhase] = useState<Phase>("select");
     const [quizData, setQuizData] = useState<QA[]>([]);
     const [current, setCurrent] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [wrongSet, setWrongSet] = useState<QA[]>([]);
 
-    // ────────────────────────────────────────────
-    // 3️⃣ 데이터 없을 시 홈으로
-    // ────────────────────────────────────────────
+    /* ── 3. 데이터 없으면 홈 리다이렉트 ── */
     useEffect(() => {
         if (!allData.length && category && rawSub) {
             alert("해당 카테고리에 데이터가 없습니다.");
-            router.push("/");
+            router.replace("/");
         }
-    }, [category, rawSub, allData, router]);
+    }, [allData.length, category, rawSub, router]);
 
-    // ────────────────────────────────────────────
-    // 4️⃣ 모드(순서/랜덤) 선택 (useCallback)
-    // ────────────────────────────────────────────
-    const handleModeSelect = useCallback(
-        (mode: "ordered" | "random") => {
-            const missedIdxList = (router.query.missed as string | undefined)
-                ?.split(",")
-                .map(Number)
-                .filter((n) => !isNaN(n) && n >= 0 && n < allData.length);
-
-            const base: QA[] =
-                missedOnly === "true" && missedIdxList?.length
-                    ? missedIdxList.map((i) => allData[i])
-                    : allData;
-
-            const final = mode === "random" ? shuffleArray(base) : base;
-            setQuizData(final);
-            setPhase("learn");
-        },
-        [allData, missedOnly, router.query.missed]
-    );
-
-    // ────────────────────────────────────────────
-    // 4️⃣ select-phase 키보드 지원 (←=ordered, →=random)
-    // ────────────────────────────────────────────
+    /* ── 4. 퀴즈 데이터 세팅 (phase === 'select' 한정) ── */
     useEffect(() => {
-        if (phase !== "select") return;
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === "ArrowLeft") {
-                handleModeSelect("ordered");
-            }
-            if (e.key === "ArrowRight") {
-                handleModeSelect("random");
-            }
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [phase, handleModeSelect]);
+        if (!allData.length || phase !== "select") return;
 
-    // ────────────────────────────────────────────
-    // 5️⃣ 학습 로직 (알아요/몰라요)
-    // ────────────────────────────────────────────
+        const missedIdxList =
+            typeof router.query.missed === "string"
+                ? router.query.missed
+                    .split(",")
+                    .map(Number)
+                    .filter((i) => !Number.isNaN(i) && i >= 0 && i < allData.length)
+                : [];
+
+        const base =
+            missedOnly === "true" && missedIdxList.length
+                ? missedIdxList.map((i) => allData[i])
+                : allData;
+
+        const final = modeParam === "random" ? shuffle(base) : base;
+
+        setQuizData(final);
+        setPhase("learn"); // ✅ 한 번만 실행
+    }, [allData, missedOnly, router.query.missed, modeParam, phase]);
+
+    /* ── 5. 학습 로직 ── */
     const know = useCallback(() => {
         setShowAnswer(false);
-        if (current + 1 >= quizData.length) {
-            setPhase("done");
-        } else {
-            setCurrent((i) => i + 1);
-        }
-    }, [current, quizData.length]);
+        setCurrent((prev) => {
+            const next = prev + 1;
+            if (next >= quizData.length) {
+                setPhase("done");
+                return prev;
+            }
+            return next;
+        });
+    }, [quizData.length]);
 
     const dont = useCallback(() => {
-        const item = quizData[current];
+        const q = quizData[current];
         setWrongSet((prev) =>
-            prev.some((q) => q.question === item.question) ? prev : [...prev, item]
+            prev.some((x) => x.question === q.question) ? prev : [...prev, q],
         );
         know();
-    }, [current, quizData, know]);
+    }, [current, know, quizData]);
 
-    // ────────────────────────────────────────────
-    // 6️⃣ 학습-phase 키보드 단축키
-    // ────────────────────────────────────────────
+    /* ── 6. 키보드 단축키 ── */
     useEffect(() => {
         if (phase !== "learn") return;
         const onKey = (e: KeyboardEvent) => {
-            if (!showAnswer) {
-                setShowAnswer(true);
-            } else {
-                if (e.key === "ArrowRight") know();
-                if (e.key === "ArrowLeft") dont();
-            }
+            if (!showAnswer) setShowAnswer(true);
+            else if (e.key === "ArrowRight") know();
+            else if (e.key === "ArrowLeft") dont();
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [phase, showAnswer, know, dont]);
 
-    // ────────────────────────────────────────────
-    // 7️⃣ 오답만 재도전
-    // ────────────────────────────────────────────
+    /* ── 7. 오답 재도전 ── */
     const retryWrongSet = () => {
         if (!wrongSet.length) return;
-        setQuizData(shuffleArray(wrongSet));
+        setQuizData(shuffle(wrongSet));
         setWrongSet([]);
         setCurrent(0);
         setShowAnswer(false);
         setPhase("learn");
     };
 
-    // ────────────────────────────────────────────
-    // 8️⃣ 홈으로
-    // ────────────────────────────────────────────
-    const goHome = () => {
-        if (typeof category === "string") {
-            router.push(`/${encodeURIComponent(category)}`);
-        } else {
-            router.push("/");
-        }
-    };
+    /* ── 8. 홈 이동 ── */
+    const goHome = () =>
+        router.push(
+            typeof category === "string" ? `/${encodeURIComponent(category)}` : "/",
+        );
 
-    // ────────────────────────────────────────────
-    // 9️⃣ 화면 렌더
-    // ────────────────────────────────────────────
+    /* ── 9. 로딩 가드 ── */
     if (phase === "select") {
         return (
-            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-purple-600 text-white px-4">
-                <h1 className="text-2xl font-bold mb-8">문제 풀기 모드 선택</h1>
-                <div className="space-y-4 w-full max-w-xs">
-                    <button
-                        onClick={() => handleModeSelect("ordered")}
-                        className="w-full py-3 bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 transition"
-                    >
-                        순서대로 풀기 / ←
-                    </button>
-                    <button
-                        onClick={() => handleModeSelect("random")}
-                        className="w-full py-3 bg-pink-500 rounded-lg font-semibold hover:bg-pink-600 transition"
-                    >
-                        랜덤으로 풀기 / →
-                    </button>
-                </div>
-            </div>
+            <main className="min-h-screen flex items-center justify-center bg-white">
+                <p className="animate-pulse text-gray-400">문제를 불러오는 중…</p>
+            </main>
         );
     }
 
+    /* ── 10. 완료 화면 ── */
     if (phase === "done") {
         const cleared = wrongSet.length === 0;
         return (
-            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-green-500 to-teal-600 text-white px-4 space-y-8">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-500 to-teal-600 px-4 text-white space-y-8">
                 {cleared ? (
                     <>
-                        <h1 className="text-3xl font-bold">🎉 잘했어요! 🎉</h1>
-                        <p className="text-lg">모든 문제를 완벽하게 풀었어요!</p>
+                        <h1 className="text-3xl font-bold">🎉 잘했어요!</h1>
+                        <p className="text-lg">모든 문제를 완벽하게 풀었습니다.</p>
                     </>
                 ) : (
                     <>
                         <h1 className="text-2xl font-bold">📋 오답 노트</h1>
-                        <ul className="bg-white/10 rounded-xl p-6 space-y-2 max-w-xl w-full text-left overflow-y-auto max-h-[60vh]">
-                            {wrongSet.map((q, idx) => (
-                                <li key={idx} className="text-white/90 space-y-1">
+                        <ul className="max-h-[60vh] w-full max-w-xl overflow-y-auto space-y-2 rounded-xl bg-white/10 p-6 text-left">
+                            {wrongSet.map((q, i) => (
+                                <li key={i} className="space-y-1 text-white/90">
                                     <div className="font-semibold">Q. {q.question}</div>
                                     <div className="text-green-300">A. {q.answer}</div>
                                 </li>
@@ -193,7 +150,7 @@ export default function QuizPage() {
                         </ul>
                         <button
                             onClick={retryWrongSet}
-                            className="px-6 py-3 bg-red-100 text-red-700 font-semibold rounded-lg hover:bg-red-200 transition"
+                            className="rounded-lg bg-red-100 px-6 py-3 font-semibold text-red-700 hover:bg-red-200"
                         >
                             오답만 다시 풀기
                         </button>
@@ -201,7 +158,7 @@ export default function QuizPage() {
                 )}
                 <button
                     onClick={goHome}
-                    className="px-6 py-3 bg-white text-green-700 font-bold rounded-lg shadow-md hover:bg-gray-100 transition-colors duration-300"
+                    className="rounded-lg bg-white px-6 py-3 font-bold text-green-700 shadow-md hover:bg-gray-100"
                 >
                     홈으로 돌아가기
                 </button>
@@ -209,30 +166,39 @@ export default function QuizPage() {
         );
     }
 
-    // 학습 단계 UI
+    /* ── 11. 학습 화면 ── */
     const total = quizData.length;
-    const progressPercent = Math.round(((current + 1) / total) * 100);
+    const progress = Math.round(((current + 1) / total) * 100);
     const qa = quizData[current];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-6">
+            <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
+                {/* 진행바 */}
                 <div className="mb-6">
-                    <p className="text-lg font-semibold text-gray-700 mb-2">
+                    <p className="mb-2 text-lg font-semibold text-gray-700">
                         문제 {current + 1} / {total}
                     </p>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="h-3 w-full rounded-full bg-gray-200">
                         <div
-                            className="bg-green-500 h-3 rounded-full transition-all duration-300"
-                            style={{ width: `${progressPercent}%` }}
+                            className="h-3 rounded-full bg-green-500 transition-all duration-300"
+                            style={{ width: `${progress}%` }}
                         />
                     </div>
                 </div>
-                <QuizCard question={qa.question} answer={qa.answer} showAnswer={showAnswer} />
+
+                {/* 카드 */}
+                <QuizCard
+                    question={qa.question}
+                    answer={qa.answer}
+                    showAnswer={showAnswer}
+                />
+
+                {/* 버튼 */}
                 {!showAnswer ? (
                     <button
                         onClick={() => setShowAnswer(true)}
-                        className="mt-6 w-full py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300"
+                        className="mt-6 w-full rounded-lg bg-indigo-600 py-3 font-bold text-white shadow-md hover:bg-indigo-700"
                     >
                         정답 보기
                     </button>
@@ -240,13 +206,13 @@ export default function QuizPage() {
                     <div className="mt-6 flex gap-4">
                         <button
                             onClick={dont}
-                            className="flex-1 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300"
+                            className="flex-1 rounded-lg bg-red-500 py-3 font-bold text-white shadow-md hover:bg-red-600"
                         >
                             모른다
                         </button>
                         <button
                             onClick={know}
-                            className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors duration-300"
+                            className="flex-1 rounded-lg bg-green-500 py-3 font-bold text-white shadow-md hover:bg-green-600"
                         >
                             안다
                         </button>
