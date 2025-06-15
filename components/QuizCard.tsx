@@ -8,24 +8,25 @@ interface QuizCardProps {
 
 export default function QuizCard({ question, answer, showAnswer }: QuizCardProps) {
     return (
-        <div className="bg-gray-50 p-6 border border-gray-200 rounded-lg shadow-inner mb-4 flex flex-col justify-between min-h-48">
+        <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-inner mb-4 flex flex-col min-h-48">
             {/* Question Area */}
             <div className="mb-4">
-                <p className="text-xl font-bold text-gray-800 leading-relaxed">{question}</p>
+                <p className="text-2xl font-bold text-gray-800 leading-relaxed tracking-wide">
+                    {question}
+                </p>
             </div>
 
-            {/* Separator and Answer Area (conditionally rendered) */}
+            {/* Separator */}
+            {showAnswer && <hr className="border-t border-gray-300 my-4" />}
+
+            {/* Answer Area */}
             {showAnswer && (
-                <>
-                    <hr className="border-t-2 border-gray-300 my-4" /> {/* Visual separator */}
-                    <div className="mt-auto"> {/* Pushes the answer to the bottom if content is short */}
-                        <p className="text-blue-700 font-extrabold bg-blue-50 p-3 rounded-md border border-blue-200 animate-fadeIn">
-                            정답: {answer}
-                        </p>
-                    </div>
-                </>
+                <div className="mt-auto">
+                    <p className="text-gray-800 font-semibold text-xl tracking-wide">
+                        정답: <span className="text-green-600 text-2xl tracking-wider">{answer}</span>
+                    </p>
+                </div>
             )}
         </div>
     );
 }
-
