@@ -4,7 +4,6 @@ import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { quizByCategory } from "../data/questions"
 import QuizCard from "../components/QuizCard"
-import { List, Shuffle, Play, BookOpen } from "lucide-react"
 
 function shuffle<T>(arr: T[]) {
     return [...arr].sort(() => Math.random() - 0.5)
@@ -15,7 +14,7 @@ type Phase = "select" | "learn" | "done"
 
 export default function QuizPage() {
     const router = useRouter()
-    const { category, sub: rawSub, missedOnly, mode } = router.query
+    const { category, sub: rawSub, mode } = router.query
 
     const modeParam: "ordered" | "random" =
         Array.isArray(mode) ? "ordered" : mode === "random" ? "random" : "ordered"

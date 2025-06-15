@@ -35,8 +35,6 @@ export default function SubCategoryPage() {
             prev.includes(sub) ? prev.filter(s => s !== sub) : [...prev, sub],
         )
 
-    const selectAll = () => setSelected(subCategories)
-
     const start = (type: "quiz" | "sheet") => {
         if (!selected.length) return
         const subParam =
