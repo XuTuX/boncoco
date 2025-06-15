@@ -86,9 +86,10 @@ export default function QuizPage() {
     useEffect(() => {
         if (phase !== "learn") return
         const onKey = (e: KeyboardEvent) => {
+
             if (!showAnswer) {
                 setShowAnswer(true)
-            } else if (canPressKey) {
+            } else {
                 if (e.key === "ArrowRight") know()
                 else if (e.key === "ArrowLeft") dont()
             }
