@@ -72,7 +72,7 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
     ],
     "땀의 문진": [
         { "question": "표증에서 땀이 나지 않는 경우", "answer": "표한실증(表寒實證)" },
-        { "question": "표증에서 땀이 나는 경우", "answer": "표허증(表虛證) 또는 표열증(表熱證)" },
+        { "question": "표증에서 땀이 나는 경우", "answer": "표허한증(表虛寒證) 또는 표열증(表熱證)" },
         { "question": "리증에서 땀이 나지 않는 원인", "answer": "진액부족 陰血虧虛 또는 양기허" },
         { "question": "특별한 활동 없이도 땀이 나는 증상", "answer": "자한(自汗)" },
         { "question": "수면 중에 땀이 나는 증상과 주된 원인", "answer": "도한(盜汗), 원인은 음허(陰虛)" },
