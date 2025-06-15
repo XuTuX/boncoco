@@ -102,16 +102,15 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
 
         { "question": "탈항 증상인 항문기추(肛門氣墜)의 원인", "answer": "중기하함(中氣下陷)" },
 
-        { "question": "변비의 원인은?", "answer": " 실열, 음허, 기음양허" },
+        { "question": "변비의 원인은?", "answer": " 실열,한, 음허, 기음양허" },
         { "question": "설사의 원인은?", "answer": " 비허, 신양허腎陽虛, 상식傷食, 간비불화肝脾不和" },
         { "question": "이급후증의 원인은?", "answer": " 습열" },
-        { "question": "완곡불화의 원인은? ", "answer": "비허, 신허 " },
+        { "question": "완곡불화의 원인은? ", "answer": "비허, 신허의 식체 " },
         { "question": " 당결부조 溏結不調의 원인은? ", "answer": "간비불화 " },
         { "question": "항문작열 肛門作熱의 원인은? ", "answer": "대장습열 " },
         { "question": "배변불쾌 排便不快의 원인은? ", "answer": "간비불화, 대장습열 " },
         { "question": " 활설불금 滑泄不禁의 원인은? ", "answer": "  비신양허  " },
-        { "question": "항문기추 肛門氣墜: 裏急後重의 원인은? ", "answer": " 중기하함 中氣下陷  " },
-
+        { "question": "항문기추 肛門氣墜의 원인은? ", "answer": " 중기하함 中氣下陷  " },
     ],
     "소변의 문진": [
         { "question": "소변의 정상 범주", "answer": "평균적으로 주간 3~7회, 야간 0~1회 정도의 빈도로 1일 1~2리터 정도의 소변을 배출, 보통 150ml~250ml정도" },
