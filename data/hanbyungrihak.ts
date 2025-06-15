@@ -83,10 +83,6 @@ export const hanbyungrihak: { [key: string]: { question: string; answer: string 
             "answer": "X. (실증(實證)의 개념)"
         },
         {
-            "question": "원문이 주어졌을 때 음(陰)과 양(陽)을 구분하는 문제. (객관식)",
-            "answer": "음(陰)은 안정/억제/하강 등, 양(陽)은 활동/흥분/상승 등."
-        },
-        {
             "question": "<음양구분> ( )勝則熱, ( )勝則寒 《素問･陰陽應象大論》",
             "answer": " (陽)勝則熱, (陰)勝則寒 《素問･陰陽應象大論》"
         },
