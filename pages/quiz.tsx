@@ -108,7 +108,8 @@ export default function QuizPage() {
         const cleared = wrongSet.length === 0
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-emerald-200 p-6">
-                <Card className="w-full max-w-md flex flex-col">
+                {/* max-w-md → max-w-lg (넓이 확대) */}
+                <Card className="w-full max-w-lg flex flex-col">
                     <CardContent className="flex flex-col flex-grow justify-between">
                         <div className="text-center">
                             {cleared ? (
@@ -118,11 +119,11 @@ export default function QuizPage() {
                                 </>
                             ) : (
                                 <>
-                                    <h1 className="text-2xl font-bold mb-4">📋 오답 노트</h1>
-                                    <ul className="space-y-2 text-left mb-6 max-h-60 overflow-y-auto">
+                                    <h1 className="text-2xl md:text-3xl font-bold mb-4">📋 오답 노트</h1>
+                                    <ul className="space-y-4 text-left mb-6 max-h-80 md:max-h-96 overflow-y-auto ">
                                         {wrongSet.map((q, i) => (
-                                            <li key={i}>
-                                                <div className="font-semibold">Q. {q.question}</div>
+                                            <li key={i} className="text-lg md:text-xl">
+                                                <div className="font-semibold mb-1">Q. {q.question}</div>
                                                 <div className="text-green-600">A. {q.answer}</div>
                                             </li>
                                         ))}
