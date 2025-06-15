@@ -6,6 +6,7 @@ import { quizByCategory } from "../data/questions";
 export default function SubCategoryPage() {
     const router = useRouter();
     const { major } = router.query;
+    const [selected, setSelected] = useState<string[]>([]);
 
     /* ─── 1. 예외 처리 ─────────────────────── */
     if (typeof major !== "string" || !quizByCategory[major])
@@ -17,7 +18,6 @@ export default function SubCategoryPage() {
 
     /* ─── 2. 상태 ───────────────────────────── */
     const subCategories = Object.keys(quizByCategory[major]);
-    const [selected, setSelected] = useState<string[]>([]);
     const toggle = (sub: string) =>
         setSelected((prev) =>
             prev.includes(sub) ? prev.filter((s) => s !== sub) : [...prev, sub]
@@ -78,8 +78,8 @@ export default function SubCategoryPage() {
                     onClick={startQuiz}
                     disabled={!selected.length}
                     className={`w-full py-4 rounded-xl font-bold transition-colors duration-150 ${selected.length
-                            ? "bg-green-500 hover:bg-green-600 text-white shadow-md"
-                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                        ? "bg-green-500 hover:bg-green-600 text-white shadow-md"
+                        : "bg-gray-300 text-gray-600 cursor-not-allowed"
                         }`}
                 >
                     {selected.length ? `선택한 ${selected.length}개 학습 시작` : "카테고리 선택"}
