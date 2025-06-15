@@ -143,8 +143,8 @@ export default function QuizPage() {
             <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-purple-600 text-white px-4">
                 <h1 className="text-2xl font-bold mb-8">문제 풀기 모드 선택</h1>
                 <div className="space-y-4 w-full max-w-xs">
-                    <button onClick={() => handleModeSelect("ordered")} className="w-full py-3 bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 transition">순서대로 풀기</button>
-                    <button onClick={() => handleModeSelect("random")} className="w-full py-3 bg-pink-500 rounded-lg font-semibold hover:bg-pink-600 transition">랜덤으로 풀기</button>
+                    <button onClick={() => handleModeSelect("ordered")} className="w-full py-3 bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 transition">순서대로 풀기 키보드 오른쪽</button>
+                    <button onClick={() => handleModeSelect("random")} className="w-full py-3 bg-pink-500 rounded-lg font-semibold hover:bg-pink-600 transition">랜덤으로 풀기 키보드 왼쪽 </button>
                 </div>
             </div>
         );

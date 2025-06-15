@@ -326,7 +326,7 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "껄끄러운 맥으로 혈액/진액 부족이나 담음 장애를 나타내는 것", "answer": "삽맥(澁脈)" },
         { "question": "거친 새끼줄 같은 긴장감이 있으며 한실증(寒實證)을 나타내는 맥", "answer": "긴맥(緊脈)" },
         { "question": "활시위처럼 탄력이 있으며 간(肝)과 관련된 맥", "answer": "현맥(弦脈)" },
-        { "question": "맥이 빠르면서(삭) 간헐적으로 결손되는 부정맥", "answer": "촉맥(促脈)" },
+        { "question": "맥이 빠르면서 간헐적으로 결손되는 부정맥", "answer": "촉맥(促脈)" },
         { "question": "맥이 빠르지 않으면서(지 또는 평) 간헐적으로 결손되는 부정맥", "answer": "결맥(結脈)" },
         { "question": "규칙적인 주기로 박동이 결손되며 심양허 등을 나타내는 부정맥", "answer": "대맥(代脈)" },
         { "question": "맥이 부위(浮位)에서는 강하나 안위(按位)에서는 비어있는 유력맥", "answer": "혁맥(革脈)" },
