@@ -42,8 +42,8 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "입에서 사과향(과일향)이 나는 경우 의심 질환", "answer": "당뇨병" },
         { "question": "입에서 계란 썩는 냄새가 나는 경우 의심 질환", "answer": "만성 간염, 간경변" },
         { "question": "입에서 암모니아 냄새가 나는 경우 의심 질환", "answer": "신장기능 이상" },
-        { "question": "생선비린내", "answer": "폐옹" },
-        { "question": "썩은 냄새", "answer": "농양, 기침시 농혈을 토함" },
+        { "question": "입에서 생선비린내", "answer": "폐옹" },
+        { "question": "입에서 썩은 냄새", "answer": "농양, 기침시 농혈을 토함" },
         { "question": "배란일 전후 48시간에 나는 입 냄새", "answer": "황체 호르몬 분비에 의한 생리적 현상" }
     ],
     "병실의 냄새": [
@@ -73,7 +73,7 @@ export const jindanQuiz: { [key: string]: { question: string; answer: string }[]
     "땀의 문진": [
         { "question": "표증에서 땀이 나지 않는 경우", "answer": "표실증(表實證)" },
         { "question": "표증에서 땀이 나는 경우", "answer": "표허증(表虛證) 또는 표열증(表熱證)" },
-        { "question": "리증에서 땀이 나지 않는 원인", "answer": "진액부족 또는 양기허" },
+        { "question": "리증에서 땀이 나지 않는 원인", "answer": "진액부족 陰血虧虛 또는 양기허" },
         { "question": "특별한 활동 없이도 땀이 나는 증상", "answer": "자한(自汗)" },
         { "question": "수면 중에 땀이 나는 증상과 주된 원인", "answer": "도한(盜汗), 원인은 음허(陰虛)" },
         { "question": "묽고 차가운 땀이 나는 증상", "answer": "냉한(冷汗)" },
