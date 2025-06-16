@@ -43,7 +43,7 @@ export default function SubCategoryPage() {
             major,
         )}&sub=${subParam}&mode=${mode}`
         if (type === "quiz") {
-            router.replace(`/quiz?${base}`)
+            router.push(`/quiz?${base}`)
         } else {
             router.push(`/answer-sheet?${base}`)
         }
