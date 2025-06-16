@@ -42,9 +42,12 @@ export default function SubCategoryPage() {
         const base = `category=${encodeURIComponent(
             major,
         )}&sub=${subParam}&mode=${mode}`
-        router.replace(type === "quiz" ? `/quiz?${base}` : `/answer-sheet?${base}`)
+        if (type === "quiz") {
+            router.replace(`/quiz?${base}`)
+        } else {
+            router.push(`/answer-sheet?${base}`)
+        }
     }
-
     const isActive = !!selected.length
 
     /* ─── 3. UI ──────────────────────────────── */
