@@ -3,6 +3,7 @@ import { bonchoQuiz } from "./bonchoQuiz";
 import { jindanQuiz } from "./jindanQuiz";
 import { modernPhysiology } from "./modernPhysiology";
 import { hanbyungrihak } from "./hanbyungrihak";
+import { sanghan } from "./sanghan";
 
 export const quizByCategory: {
     [major: string]: { [sub: string]: { question: string; answer: string }[] };
@@ -11,5 +12,6 @@ export const quizByCategory: {
     진단학: jindanQuiz,
     양방생리: modernPhysiology,
     병리학: hanbyungrihak,
+    상한: sanghan
 };
 
