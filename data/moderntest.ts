@@ -153,7 +153,7 @@ export const moderntest: { [key: string]: { question: string; answer: string }[]
         },
         {
             "question": "평활근에서 Ca2+의 주된 공급원은?",
-            "answer": "세포외액 (L-type Ca2+ 채널을 통해 유입), 근형질세망 (SR)."
+            "answer": "L-type Ca2+ 채널을 통해 유입."
         },
         {
             "question": "골격근 수축 시 근원섬유의 A, I, H 밴드의 길이 변화는?",
