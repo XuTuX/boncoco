@@ -113,7 +113,7 @@ export default function QuizPage() {
     }
 
     const goHome = () =>
-        router.push(
+        router.replace(
             typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
         )
 
