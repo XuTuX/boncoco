@@ -45,7 +45,7 @@ export default function AnswerSheet() {
             `category=${encodeURIComponent(String(category))}` +
             `&sub=${encodeURIComponent(String(rawSub))}` +
             `&mode=${modeParam}`;
-        router.push(`/quiz?${base}`);
+        router.replace(`/quiz?${base}`);
     };
 
     const goToQuizUnknown = () => {
