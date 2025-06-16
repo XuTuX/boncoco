@@ -44,7 +44,7 @@ export default function AnswerSheet() {
         const base =
             `category=${encodeURIComponent(String(category))}` +
             `&sub=${encodeURIComponent(String(rawSub))}` +
-            `&mode=${modeParam}`;
+            `&mode=random`;
         router.push(`/quiz?${base}`);
     };
 
