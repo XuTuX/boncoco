@@ -14,7 +14,8 @@ export default function Header() {
                     variant="ghost"
                     size="sm"
                     className="text-gray-600 hover:text-gray-800"
-                    onClick={() => router.back()}   // ← 이전 페이지로 이동
+                    onClick={() => router.push('/')}
+
                 >
                     <Home className="h-4 w-4 mr-1" />
                     홈으로
