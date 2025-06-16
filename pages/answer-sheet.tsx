@@ -26,7 +26,9 @@ export default function AnswerSheet() {
     }, [category, rawSub]);
 
     /* 2. 랜덤 모드 */
-    const data = modeParam === "random" ? [...all].sort(() => Math.random() - 0.5) : all;
+    const data = useMemo(() => {
+        return modeParam === "random" ? [...all].sort(() => Math.random() - 0.5) : all;
+    }, [all, modeParam]);
 
     /* 3. 상태 */
     const [open, setOpen] = useState<Record<number, boolean>>({});
