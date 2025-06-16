@@ -7,19 +7,23 @@ import { Home, ArrowLeft } from "lucide-react";
 
 export default function Header() {
     const router = useRouter();
+    const isHome = router.pathname === "/";
+
     return (
         <header className="w-full py-4 bg-white shadow-md">
             <div className="container mx-auto flex justify-between">
-                {/* 왼쪽: 이전으로 버튼 */}
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-gray-800"
-                    onClick={() => router.back()}
-                >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    이전으로
-                </Button>
+                {/* 왼쪽: 이전으로 버튼 (홈에서는 숨김) */}
+                {isHome ? <div /> : (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 hover:text-gray-800"
+                        onClick={() => router.back()}
+                    >
+                        <ArrowLeft className="h-4 w-4 mr-1" />
+                        이전으로
+                    </Button>
+                )}
 
                 {/* 오른쪽: 홈으로 버튼 */}
                 <Button
