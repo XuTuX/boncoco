@@ -81,7 +81,7 @@ export const sanghanQuiz: { [key: string]: { question: string; answer: string }[
             "answer": "文蛤散"
         },
         {
-            "question": "太陽病,二三日,不能臥,但欲起,心下必結, 脈微弱者,此본有( )也. 反下之,若利止,必作結胸;未止者,四日復下之,此作協熱利也. (주관식, 20 기출)",
+            "question": "太陽病, 二三日, 不能臥, 但欲起, 心下必結, 脈微弱者, 此本有( )也. 反下之, 若利止, 必作結胸; 未止者, 四日復下之, 此作協熱利也. (주관식, 20 기출)",
             "answer": "寒分"
         },
         {
@@ -208,7 +208,7 @@ export const sanghanQuiz: { [key: string]: { question: string; answer: string }[
         },
         {
             "question": "太陽病中風,以火劫發汗했을 때 증상이 아닌 것은? (20 기출)",
-            "answer": "大변溏薄"
+            "answer": "大便溏薄"
         },
         {
             "question": "太陽病中風,以火劫發汗,邪風被火熱,血氣流溢,失其常度.兩陽相熏灼, 其身( ).",
@@ -271,7 +271,7 @@ export const sanghanQuiz: { [key: string]: { question: string; answer: string }[
             "answer": "胃中虛冷"
         },
         {
-            "question": "太陽病,過經十餘日,心下溫溫欲吐,而흉中痛,大변反溏,복微滿, 鬱鬱微煩. 의 증상이 극렬한 吐下로 인해 발생한 경우, 사용할 수 있는 처방은? (18 기출)",
+            "question": " 太陽病, 過經十餘日, 心下溫溫欲吐, 而胸中痛, 大便反溏, 腹微滿, 鬱鬱微煩. 의 증상이 극렬한 吐下로 인해 발생한 경우, 사용할 수 있는 처방은? (18 기출)",
             "answer": "調胃承氣湯"
         },
         {
@@ -291,7 +291,7 @@ export const sanghanQuiz: { [key: string]: { question: string; answer: string }[
             "answer": "裏急"
         },
         {
-            "question": "129. 何謂臟結?答曰:如結胸狀,飲食如故,時時下利, 寸脈浮,關脈小細沈緊,명曰( ),舌上白태滑者,難治.",
+            "question": "129.  何謂臟結?答曰: 如結胸狀 , 飮食如故, 時時下利, 寸脈浮, 關脈小細沈緊 ,名曰( ) , 舌上白胎滑 者, 難治.",
             "answer": "藏結"
         },
         {
