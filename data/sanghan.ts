@@ -53,7 +53,7 @@ export const sanghan: { [key: string]: { question: string; answer: string }[] } 
             "answer": "瘡家가 身疼痛한데 發汗시켰을 때"
         },
         {
-            "question": "창증? (19 기출)",
+            "question": "창(瘡)증? (19 기출)",
             "answer": "疰(치증)"
         },
         {
