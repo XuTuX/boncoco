@@ -1,6 +1,5 @@
 export const moderntest: { [key: string]: { question: string; answer: string }[] } = {
     "적혈구 및 빈혈": [
-        { "question": "철결핍성 빈혈의 요인 2가지", "answer": "이식증, 구각염 등이 한자" },
         { "question": "Erythropoietin 고르기 문제", "answer": "신장 분비, 산소 부족 감지, 적골수 자극, 적혈구 생성." }
     ],
     "혈구 및 혈장 단백질": [

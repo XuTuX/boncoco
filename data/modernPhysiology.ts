@@ -417,10 +417,6 @@ export const modernPhysiology: { [key: string]: { question: string; answer: stri
             "answer": "맛 수용기세포에서 글루탐산이 방출되기 위해서는 Ca2+ 이온이 유입되어야 한다."
         },
         {
-            "question": "미각 정보가 뇌로 전달되는 경로는 어떻게 되는가?",
-            "answer": "미각 정보는 뇌신경섬유를 통해 뇌간의 고속핵, 시상, 미각영역으로 전달된다."
-        },
-        {
             "question": "인간이 느끼는 다섯 가지 1차 맛은 무엇인가?",
             "answer": "인간이 느끼는 다섯 가지 1차 맛은 짠맛, 신맛, 단맛, 쓴맛, 우마미맛이다."
         },
