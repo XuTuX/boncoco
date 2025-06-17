@@ -10,6 +10,8 @@ import { sanghan } from "./sanghan";
 import { sanghanQuiz } from "./sanghanQuiz";
 import { moderntest } from "./moderntest";
 import { bonconum } from "./bonconum";
+import { anatomtest } from "./anatomtest";
+
 
 
 export const quizByCategory: {
@@ -25,5 +27,6 @@ export const quizByCategory: {
     상한: sanghan,
     상한_객관식_주관식: sanghanQuiz,
     양방생리_기출만: moderntest,
-    본초_객관식: bonconum
+    본초_객관식: bonconum,
+    해부_단답: anatomtest
 };
