@@ -1,4 +1,3 @@
-//Users/kik/next_project/bonco-quiz/data/bonchoQuiz.ts
 export const bonchoQuiz: { [key: string]: { question: string; answer: string }[] } = {
     청열해독약: [
         { "question": "황화지정(黃花地丁) 이명", "answer": "포공영" },
@@ -7,8 +6,8 @@ export const bonchoQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "열리, 설사, 적백대하, 목적종통, 목생예막 치료", "answer": "진피" },
         { "question": "기원이 인동덩굴", "answer": "금은화" },
         { "question": "다량의 noradrenaline 함유약물", "answer": "마치현" },
-        { "question": "기원이 숭람", "answer": "판람근" },
-        { "question": "기원이 숭람", "answer": "청대" },
+        { "question": "기원이 숭람 1", "answer": "판람근" },
+        { "question": "기원이 숭람 2", "answer": "청대" },
         { "question": "기원이 딱지꽃", "answer": "위릉채" },
         { "question": "기원이 약모밀", "answer": "어성초" },
         { "question": "기원이 할미꽃", "answer": "백두옹" },
@@ -41,15 +40,15 @@ export const bonchoQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "기원이 가회톱", "answer": "백렴" },
         { "question": "기원이 청미래덩굴", "answer": "토복령" },
         { "question": "기원이 쇠비름", "answer": "마치현" },
-        { "question": "기원이 숭람", "answer": "대청엽" },
+        { "question": "기원이 숭람 3", "answer": "대청엽" },
         { "question": "기원이 월남괴", "answer": "산두근" },
         { "question": "기원이 제비꽃", "answer": "자화지정" },
         { "question": "옹종창독, 파두 및 부자 중독, 서열번갈 치료", "answer": "녹두" },
     ],
     청허열약: [
         { "question": "기원이 대나물", "answer": "은시호" },
-        { "question": "제증에 별혈초하는 약물", "answer": "청호" },
-        { "question": "제증에 별혈초하는 약물", "answer": "은시호" },
+        { "question": "제증에 별혈초하는 약물 1", "answer": "청호" },
+        { "question": "제증에 별혈초하는 약물 2", "answer": "은시호" },
         { "question": "부인과 산후 혈허발열 치료", "answer": "백미" },
         { "question": "기원이 구기자나무", "answer": "지골피" },
         { "question": "학질치료 arteannuin 성분", "answer": "청호" },
@@ -61,7 +60,7 @@ export const bonchoQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "소아경풍, 감적, 충적 치료약물", "answer": "노회" },
     ],
     윤하약: [
-        { "question": "기원이 이스라지", "answer": "욱리인" },
+        { "question": "기원이 이스라지 1", "answer": "욱리인" },
         { "question": "윤조활장, 하기, 이수 효능약물", "answer": "욱리인" },
         { "question": "기원이 삼", "answer": "화마인" },
         { "question": "기원이 장병편도", "answer": "욱리인" },
@@ -129,11 +128,11 @@ export const bonchoQuiz: { [key: string]: { question: string; answer: string }[]
     ],
     이뇨통림약: [
         { "question": "편축 약용부위", "answer": "전초" },
-        { "question": "등심초 약용부위", "answer": "경수" },
+        { "question": "등심초 약용부위 1", "answer": "경수" },
         { "question": "기원이 댑싸리", "answer": "지부자" },
         { "question": "기원이 마디풀", "answer": "편축" },
-        { "question": "기원이 사철쑥", "answer": "인진호" },
-        { "question": "기원이 도꼬로마", "answer": "비해" },
+        { "question": "기원이 사철쑥 1", "answer": "인진호" },
+        { "question": "기원이 도꼬로마 1", "answer": "비해" },
         { "question": "수종창만, 열림삽통, 목적종통 치료약물", "answer": "차전자" },
         { "question": "구맥 약용부위", "answer": "전초" },
         { "question": "기원이 질경이", "answer": "차전자" },
