@@ -1,4 +1,10 @@
-export const bonchoQuiz: { [key: string]: { question: string; answer: string }[] } = {
+// data/bonchoQuiz.ts
+
+type QA = { question: string; answer: string };
+type RawBonchoQuizSchema = { [key: string]: QA[] };
+
+// 1. 기존 bonchoQuiz 데이터를 rawBonchoQuizData라는 이름으로 정의합니다.
+const rawBonchoQuizData: RawBonchoQuizSchema = {
     청열해독약: [
         { "question": "황화지정(黃花地丁) 이명", "answer": "포공영" },
         { "question": "유옹치료에 양호하여 유옹초기에 홍종견경하고 농종이 아직 성숙하지 않은 경우를 치료", "answer": "포공영" },
@@ -181,3 +187,41 @@ export const bonchoQuiz: { [key: string]: { question: string; answer: string }[]
         { "question": "기원이 멀구슬나무", "answer": "천련자" },
     ],
 };
+
+// QuizDataEntry는 이 파일에서만 사용되므로 여기에 두는 것이 좋습니다.
+type QuizDataEntry = { [subCategory: string]: QA[] }; // { "전체": QA[] } 와 같은 형태
+
+// 3. 원시 데이터를 가공하여 최종 export할 객체
+// processedBonchoCategories의 타입도 명시적으로 지정하여 예상치 못한 타입 추론을 방지합니다.
+const processedBonchoCategories: QuizDataEntry = {}; // <--- 여기를 수정합니다.
+
+// 3-1. 기존 카테고리들을 서브 카테고리로 직접 배치합니다.
+for (const categoryName in rawBonchoQuizData) {
+    if (Object.prototype.hasOwnProperty.call(rawBonchoQuizData, categoryName)) {
+        processedBonchoCategories[categoryName] = rawBonchoQuizData[categoryName]; // <--- 여기를 수정합니다.
+    }
+}
+
+// 3-2. "약용부위" 질문들을 추출하고 중복을 방지하여 새로운 서브 카테고리로 추가합니다.
+const medicinalPartQuestions: QA[] = [];
+const seenMedicinalPartQuestions = new Set<string>(); // 중복 방지를 위한 Set
+
+for (const categoryName in rawBonchoQuizData) {
+    if (Object.prototype.hasOwnProperty.call(rawBonchoQuizData, categoryName)) {
+        const questions = rawBonchoQuizData[categoryName];
+        for (const qa of questions) {
+            if (qa.question.includes("약용부위")) {
+                if (!seenMedicinalPartQuestions.has(qa.question)) {
+                    medicinalPartQuestions.push(qa);
+                    seenMedicinalPartQuestions.add(qa.question);
+                }
+            }
+        }
+    }
+}
+
+// 추출된 "약용부위" 질문들을 "약용부위"라는 새로운 서브 카테고리에 추가합니다.
+processedBonchoCategories["약용부위"] = medicinalPartQuestions; // <--- 여기를 수정합니다.
+
+// 4. 가공된 본초학 카테고리 데이터를 export 합니다.
+export const bonchoProcessedCategories = processedBonchoCategories;

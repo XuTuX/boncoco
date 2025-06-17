@@ -1,3 +1,5 @@
+// AnswerSheet.tsx
+
 import { useRouter } from "next/router";
 import { quizByCategory } from "../data/questions";
 import { useMemo, useState } from "react";
@@ -18,7 +20,34 @@ export default function AnswerSheet() {
         if (typeof category !== "string" || typeof rawSub !== "string") return [];
         const group = quizByCategory[category];
         if (!group) return [];
-        if (rawSub === "all") return Object.values(group).flat();
+
+        // ******** 이 if (rawSub === "all") 블록을 아래 코드로 완전히 교체하세요. ********
+        if (rawSub === "all") {
+            // "all"일 경우, 모든 서브 카테고리의 질문을 합치되, 중복을 제거합니다.
+            const uniqueQuestions = new Map<string, QA>(); // 질문 문자열을 키로 사용하여 중복 제거
+
+            for (const subCategoryKey in group) {
+                if (Object.prototype.hasOwnProperty.call(group, subCategoryKey)) {
+                    const questionsInSubCategory = group[subCategoryKey];
+                    for (const qa of questionsInSubCategory) {
+                        // 질문 문자열을 정규화하여 비교 (공백, 대소문자 무시)
+                        const normalizedQuestion = qa.question
+                            .replace(/\s+/g, ' ') // 모든 연속된 공백을 단일 스페이스로
+                            .trim()               // 양쪽 끝 공백 제거
+                            .toLowerCase();       // 대소문자 무시
+
+                        if (!uniqueQuestions.has(normalizedQuestion)) {
+                            uniqueQuestions.set(normalizedQuestion, qa);
+                        }
+                    }
+                }
+            }
+            return Array.from(uniqueQuestions.values()); // Map의 값들을 배열로 변환
+        }
+        // ******** 교체할 블록 끝 ********
+
+
+        // 특정 서브 카테고리를 선택한 경우 (이전과 동일)
         return rawSub
             .split(",")
             .filter(Boolean)

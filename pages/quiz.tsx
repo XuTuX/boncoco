@@ -9,14 +9,12 @@ function shuffle<T>(arr: T[]) {
     return [...arr].sort(() => Math.random() - 0.5)
 }
 
-type QA = { question: string; answer: string }
+type QA = { question: string; answer: string; options?: string[] }
 type Phase = "select" | "learn" | "done"
 
 export default function QuizPage() {
     const router = useRouter()
-    // onlyUnknown: "0,2,5" 같은 인덱스 리스트가 이 안으로 넘어옴
     const { category, sub: rawSub, mode, onlyUnknown } = router.query
-
 
     const modeParam: "ordered" | "random" =
         Array.isArray(mode) ? "ordered" : mode === "random" ? "random" : "ordered"
@@ -25,32 +23,31 @@ export default function QuizPage() {
         if (typeof category !== "string" || typeof rawSub !== "string") return []
         const group = quizByCategory[category]
         if (!group) return []
-        if (rawSub === "all") return Object.values(group).flat()
+        if (rawSub === "all") return Object.values(group).flat() as QA[]
         return rawSub
             .split(",")
             .filter(Boolean)
-            .flatMap((s) => group[s] ?? [])
+            .flatMap((s) => group[s] ?? []) as QA[]
     }, [category, rawSub])
 
-    // 2) onlyUnknown이 있으면, 해당 인덱스의 문제만 필터링
     const filteredData: QA[] = useMemo(() => {
         if (typeof onlyUnknown !== "string" || !onlyUnknown) {
             return allData
         }
-        // "0,2,5" → [0,2,5], NaN 필터링
         const idxs = onlyUnknown
             .split(",")
-            .map(n => parseInt(n, 10))
-            .filter(n => !isNaN(n) && n >= 0 && n < allData.length)
-        return idxs.map(i => allData[i])
+            .map((n) => parseInt(n, 10))
+            .filter((n) => !isNaN(n) && n >= 0 && n < allData.length)
+        return idxs.map((i) => allData[i])
     }, [allData, onlyUnknown])
-
 
     const [phase, setPhase] = useState<Phase>("select")
     const [quizData, setQuizData] = useState<QA[]>([])
     const [current, setCurrent] = useState(0)
     const [showAnswer, setShowAnswer] = useState(false)
     const [wrongSet, setWrongSet] = useState<QA[]>([])
+    const [selectedOption, setSelectedOption] = useState<string | null>(null)
+
     useEffect(() => {
         if (!allData.length && category && rawSub) {
             alert("해당 카테고리에 데이터가 없습니다.")
@@ -66,9 +63,9 @@ export default function QuizPage() {
         setPhase("learn")
     }, [allData, modeParam, phase, filteredData])
 
-
-    const know = useCallback(() => {
+    const goToNextQuestion = useCallback(() => {
         setShowAnswer(false)
+        setSelectedOption(null)
         setCurrent((prev) => {
             const next = prev + 1
             if (next >= quizData.length) {
@@ -79,29 +76,57 @@ export default function QuizPage() {
         })
     }, [quizData.length])
 
-    const dont = useCallback(() => {
+    const handleDontKnow = useCallback(() => {
         const q = quizData[current]
         setWrongSet((prev) =>
             prev.some((x) => x.question === q.question) ? prev : [...prev, q]
         )
-        know()
-    }, [current, know, quizData])
+        goToNextQuestion()
+    }, [current, goToNextQuestion, quizData])
+
+    const handleOptionSelect = useCallback((option: string) => {
+        // 이미 답이 공개된 상태 (두 번째 클릭)
+        if (showAnswer) {
+            // 이전에 선택했던 옵션을 다시 클릭했을 때만 다음 문제로 넘어감
+            if (option === selectedOption) {
+                goToNextQuestion();
+            }
+            return; // 다른 옵션을 클릭하면 아무것도 하지 않음
+        }
+
+        // 첫 번째 클릭: 답을 확인하는 로직
+        const isCorrect = option === quizData[current].answer;
+        setSelectedOption(option);
+        setShowAnswer(true);
+
+        if (!isCorrect) {
+            const q = quizData[current];
+            setWrongSet((prev) =>
+                prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+            );
+        }
+    }, [showAnswer, selectedOption, quizData, current, goToNextQuestion]);
 
     useEffect(() => {
         if (phase !== "learn") return
+
         const onKey = (e: KeyboardEvent) => {
+            const qa = quizData[current];
+            const isMultipleChoice = qa.options && qa.options.length > 0;
+
+            if (isMultipleChoice) return;
 
             if (!showAnswer) {
                 setShowAnswer(true)
             } else {
-                if (e.key === "ArrowRight") know()
-                else if (e.key === "ArrowLeft") dont()
+                if (e.key === "ArrowRight") goToNextQuestion()
+                else if (e.key === "ArrowLeft") handleDontKnow()
             }
         }
 
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
-    }, [phase, showAnswer, know, dont])
+    }, [phase, showAnswer, goToNextQuestion, handleDontKnow, quizData, current])
 
     const retryWrongSet = () => {
         if (!wrongSet.length) return
@@ -109,6 +134,7 @@ export default function QuizPage() {
         setWrongSet([])
         setCurrent(0)
         setShowAnswer(false)
+        setSelectedOption(null)
         setPhase("learn")
     }
 
@@ -117,7 +143,7 @@ export default function QuizPage() {
             typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
         )
 
-    if (phase === "select") {
+    if (phase === "select" || quizData.length === 0) {
         return (
             <main className="min-h-screen flex items-center justify-center bg-white">
                 <p className="animate-pulse text-gray-400">문제를 불러오는 중…</p>
@@ -125,13 +151,13 @@ export default function QuizPage() {
         )
     }
 
+    // --- 요청하신 'done' 단계 UI 코드 복원 ---
     if (phase === "done") {
         const cleared = wrongSet.length === 0
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-emerald-200 p-6">
-                {/* max-w-md → max-w-lg (넓이 확대) */}
                 <Card className="w-full max-w-lg flex flex-col">
-                    <CardContent className="flex flex-col flex-grow justify-between">
+                    <CardContent className="flex flex-col flex-grow justify-between p-6">
                         <div className="text-center">
                             {cleared ? (
                                 <>
@@ -145,6 +171,16 @@ export default function QuizPage() {
                                         {wrongSet.map((q, i) => (
                                             <li key={i} className="text-lg md:text-xl">
                                                 <div className="font-semibold mb-1">Q. {q.question}</div>
+                                                {q.options && q.options.length > 0 && (
+                                                    <div className="text-base text-gray-600">
+                                                        <p className="font-medium">선지:</p>
+                                                        <ul className="list-disc list-inside ml-2">
+                                                            {q.options.map((opt, optIdx) => (
+                                                                <li key={optIdx}>{opt}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
                                                 <div className="text-green-600">A. {q.answer}</div>
                                             </li>
                                         ))}
@@ -152,7 +188,7 @@ export default function QuizPage() {
                                 </>
                             )}
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-3 mt-4">
                             {!cleared && (
                                 <Button onClick={retryWrongSet} className="w-full">
                                     오답만 다시 풀기
@@ -167,16 +203,17 @@ export default function QuizPage() {
             </div>
         )
     }
+    // --- 'done' UI 코드 끝 ---
 
     const total = quizData.length
     const progress = Math.round(((current + 1) / total) * 100)
     const qa = quizData[current]
+    const isMultipleChoice = qa.options && qa.options.length > 0;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6 flex items-center justify-center">
             <Card className="w-full max-w-lg flex flex-col h-[80vh]">
-                <CardContent className="flex flex-col flex-grow">
-                    {/* 진행바 */}
+                <CardContent className="flex flex-col flex-grow p-4 md:p-6">
                     <div className="mb-4">
                         <p className="font-semibold text-gray-700 mb-1">
                             문제 {current + 1} / {total}
@@ -185,27 +222,49 @@ export default function QuizPage() {
                             <div className="h-2 rounded-full bg-blue-500 transition-all" style={{ width: `${progress}%` }} />
                         </div>
                     </div>
-                    {/* 카드 (고정 영역) */}
                     <div className="flex-grow overflow-auto mb-4">
-                        <QuizCard question={qa.question} answer={qa.answer} showAnswer={showAnswer} />
+                        <QuizCard
+                            question={qa.question}
+                            answer={qa.answer}
+                            options={qa.options}
+                            showAnswer={showAnswer}
+                            selectedOption={selectedOption}
+                            onOptionSelect={handleOptionSelect}
+                        />
                     </div>
                 </CardContent>
-                {/* 버튼 고정 영역 */}
                 <div className="p-4 border-t bg-white">
                     <div className="flex space-x-4">
-                        {!showAnswer ? (
-                            <Button size="lg" onClick={() => setShowAnswer(true)} className="flex-1">
-                                정답 보기
-                            </Button>
+                        {isMultipleChoice ? (
+                            showAnswer ? (
+                                <>
+                                    <Button size="lg" variant="destructive" onClick={handleDontKnow} className="flex-1">
+                                        몰랐던 문제로 저장
+                                    </Button>
+                                    <Button size="lg" variant="default" onClick={goToNextQuestion} className="flex-1">
+                                        다음 문제
+                                    </Button>
+                                </>
+                            ) : (
+                                <div className="text-center w-full text-gray-500">
+                                    선지를 선택해주세요.
+                                </div>
+                            )
                         ) : (
-                            <>
-                                <Button size="lg" variant="destructive" onClick={dont} className="flex-1">
-                                    모른다
+                            !showAnswer ? (
+                                <Button size="lg" onClick={() => setShowAnswer(true)} className="flex-1">
+                                    정답 보기
                                 </Button>
-                                <Button size="lg" variant="default" onClick={know} className="flex-1">
-                                    안다
-                                </Button>
-                            </>
+                            ) : (
+                                <>
+                                    <Button size="lg" variant="destructive" onClick={handleDontKnow} className="flex-1">
+                                        모른다
+                                    </Button>
+                                    <Button size="lg" variant="default" onClick={goToNextQuestion} className="flex-1">
+                                        안다
+                                    </Button>
+                                </>
+                            )
                         )}
                     </div>
                 </div>
