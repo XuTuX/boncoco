@@ -1,5 +1,6 @@
 export const anatomtest: { [key: string]: { question: string; answer: string }[] } = {
     "O/X형 문제": [
+        // --- 기존 문제 ---
         { "question": "심장의 apex위치는 왼쪽 5번째 갈비사이공간(intercostal space)에 위치한다.", "answer": "O" },
         { "question": "승모판은 우심방과 우심실 사이에 위치한다.", "answer": "X (승모판은 좌심방과 좌심실 사이에 위치)" },
         { "question": "5번 뇌신경은 삼차신경으로 얼굴의 감각을 담당한다.", "answer": "O" },
@@ -33,13 +34,57 @@ export const anatomtest: { [key: string]: { question: string; answer: string }[]
         { "question": "관상동맥(coronary arteries)은 심장 자체에 산소와 영양분을 공급하는 심장 전용 동맥이다.", "answer": "O" },
         { "question": "심장에는 좌심방에서 좌심실 방향으로 혈류가 역류하지 않도록 삼첨판(Tricuspid)이 있다.", "answer": "X (좌심방과 좌심실 사이에는 승모판(이첨판)이 있음)" },
         { "question": "심장에서는 left coronary artery와 right coronary artery가 서로 anastomosis를 한다.", "answer": "O" },
+
+        // --- 추가된 O/X 문제 (20개) ---
+        { "question": "삼첨판은 좌심방과 좌심실 사이에 위치한다.", "answer": "X (삼첨판은 우심방과 우심실 사이에 위치)" },
+        { "question": "7번 뇌신경(얼굴신경)은 얼굴의 표정근을 지배한다.", "answer": "O" },
+        { "question": "소뇌는 몸의 평형 유지와 미세 운동 조절에 관여한다.", "answer": "O" },
+        { "question": "척수가 끝나는 부분인 척수원뿔(conus medullaris) 아래로 이어지는 신경 다발을 말총(cauda equina)이라 한다.", "answer": "O" },
+        { "question": "체순환에서 혈액은 좌심실에서 출발하여 대동맥을 거쳐 온몸으로 간 후, 위대정맥과 아래대정맥을 통해 우심방으로 돌아온다.", "answer": "O" },
+        { "question": "척수의 백색질(white matter)에는 신경세포체가, 회색질(gray matter)에는 신경섬유가 주로 분포한다.", "answer": "X (반대임. 회색질에 신경세포체, 백색질에 신경섬유가 분포)" },
+        { "question": "좌심실 벽이 우심실 벽보다 두꺼운 이유는 전신으로 혈액을 더 강하게 펌프질해야 하기 때문이다.", "answer": "O" },
+        { "question": "심장의 정맥혈은 대부분 관상정맥굴(coronary sinus)을 통해 좌심방으로 들어간다.", "answer": "X (우심방으로 들어감)" },
+        { "question": "위눈꺼풀올림근은 3번 뇌신경(눈돌림신경)의 지배를 받는다.", "answer": "O" },
+        { "question": "정중신경(median nerve)은 팔신경얼기의 뒤다발(posterior cord)에서 나온다.", "answer": "X (가쪽다발과 안쪽다발에서 나옴)" },
+        { "question": "눈을 가쪽으로 움직이는 가쪽곧은근(lateral rectus m.)은 6번 뇌신경(갓돌림신경)의 지배를 받는다.", "answer": "O" },
+        { "question": "심방과 심실을 나누는 막을 심실사이막(interventricular septum)이라고 한다.", "answer": "X (심방과 심실을 나누는 것은 방실사이막 또는 심장뼈대이며, 심실사이막은 좌우 심실을 나눔)" },
+        { "question": "심장 청진 시 들리는 제1심음(S1)은 대동맥판막과 허파동맥판막이 닫히는 소리이다.", "answer": "X (S1은 승모판과 삼첨판이 닫히는 소리)" },
+        { "question": "얼굴동맥(facial artery)은 속목동맥(internal carotid artery)에서 분지한다.", "answer": "X (바깥목동맥(external carotid a.)에서 분지)" },
+        { "question": "얕은손바닥동맥활(superficial palmar arch)은 주로 노동맥(radial artery)에 의해 형성된다.", "answer": "X (주로 자동맥(ulnar a.)에 의해 형성)" },
+        { "question": "혀의 뒤쪽 1/3의 맛과 일반 감각은 혀인두신경(glossopharyngeal n.)이 담당한다.", "answer": "O" },
+        { "question": "대부분의 사람에게서 심장박동을 조율하는 굴심방결절(SA node)은 오른관상동맥(RCA)으로부터 혈액을 공급받는다.", "answer": "O" },
+        { "question": "브로카 영역과 베르니케 영역은 서로 독립적으로 기능하며 연결되어 있지 않다.", "answer": "X (활꼴다발(arcuate fasciculus)로 연결되어 있음)" },
+        { "question": "손목터널증후군은 자신경(ulnar nerve)이 손목굴(carpal tunnel)에서 눌려서 발생한다.", "answer": "X (정중신경(median nerve)이 눌려서 발생)" },
+        { "question": "폐동맥에는 동맥혈이, 폐정맥에는 정맥혈이 흐른다.", "answer": "X (반대임. 폐동맥에는 정맥혈, 폐정맥에는 동맥혈이 흐름)" },
     ],
     "단답형 문제": [
+        // --- 기존 문제 ---
         { "question": "혀의 앞쪽 2/3의 일반 감각은 ( ), 맛은 얼굴신경이, 운동신경은 혀밑신경이 담당한다.", "answer": "삼차신경" },
         { "question": "spinal cord의 단면에서 anterior horn은 운동, posterior horn은 ( ) 부분에 해당함.", "answer": "감각" },
         { "question": "심장을 좌우로 잡아주는 혈관은 ( )이다.", "answer": "허파정맥" },
         { "question": "뇌에서 음성을 생성하는데 관여하는 영역은 ( ) 영역이다.", "answer": "브로카" },
         { "question": "혀의 앞쪽 2/3의 일반 감각은 삼차신경이 담당하고, 운동신경은 ( )이 담당한다.", "answer": "혀밑신경" },
 
+        // --- 추가된 단답형 문제 (20개) ---
+        { "question": "심장의 꼭대기(apex)는 왼쪽 ( )번째 갈비사이공간에서 촉진될 수 있다.", "answer": "5" },
+        { "question": "좌심방과 좌심실 사이에서 혈액의 역류를 방지하는 판막은 ( )이다.", "answer": "승모판 (또는 이첨판)" },
+        { "question": "생명 유지에 필수적인 심장, 호흡, 혈압 조절 중추가 위치한 뇌줄기 부분은 ( )이다.", "answer": "숨뇌 (또는 연수)" },
+        { "question": "언어의 이해와 관련이 깊은 뇌의 영역은 ( ) 영역이다.", "answer": "베르니케" },
+        { "question": "성인의 척수는 보통 ( ) 척추뼈 높이에서 끝난다.", "answer": "L1-L2" },
+        { "question": "간경화 등으로 문맥압이 항진되었을 때 배꼽 주변 정맥이 확장되어 보이는 증상을 ( )라고 한다.", "answer": "메두사의 머리 (caput medusae)" },
+        { "question": "우심실에서 나온 혈액이 폐를 거쳐 좌심방으로 돌아오는 순환을 ( )이라고 한다.", "answer": "폐순환 (또는 소순환)" },
+        { "question": "심장의 뒤쪽 면, 심실사이고랑을 따라 주행하며 혈액을 공급하는 동맥은 ( )이다.", "answer": "뒤심실사이동맥 (PDA)" },
+        { "question": "위빗근(superior oblique m.)을 지배하여 눈을 아래안쪽으로 움직이게 하는 뇌신경은 ( )이다.", "answer": "도르래신경 (제4뇌신경)" },
+        { "question": "팔신경얼기(brachial plexus)의 뒤다발(posterior cord)에서 분지하여 어깨세모근(deltoid m.)을 지배하는 신경은 ( )이다.", "answer": "겨드랑신경 (axillary nerve)" },
+        { "question": "시각 정보를 뇌로 전달하는 역할을 하는 뇌신경은 제2뇌신경인 ( )이다.", "answer": "시각신경 (optic nerve)" },
+        { "question": "심장 판막들을 지지하고 심방과 심실의 전기적 신호를 분리하는 역할을 하는 섬유성 구조물은 ( )이다.", "answer": "심장뼈대 (fibrous skeleton)" },
+        { "question": "우심방과 우심실 사이에서 혈액의 역류를 방지하는 판막은 ( )이다.", "answer": "삼첨판 (Tricuspid valve)" },
+        { "question": "자세 유지, 균형 감각, 그리고 부드러운 수의운동 조절에 중요한 역할을 하는 뇌의 부분은 ( )이다.", "answer": "소뇌" },
+        { "question": "척수가 끝난 후 척추관 내에서 계속 아래로 뻗어 나가는 허리엉치신경 뿌리들의 다발을 ( )(이)라고 부른다.", "answer": "말총 (cauda equina)" },
+        { "question": "손목터널증후군(carpal tunnel syndrome)은 ( ) 신경이 압박되어 발생한다.", "answer": "정중신경 (median nerve)" },
+        { "question": "온몸을 순환하고 돌아온 산소가 적은 혈액이 가장 먼저 도착하는 심장의 방은 ( )이다.", "answer": "우심방" },
+        { "question": "심장 자체의 정맥혈을 모아 우심방으로 보내는 가장 큰 정맥 혈관은 ( )이다.", "answer": "관상정맥굴 (coronary sinus)" },
+        { "question": "혀의 운동을 담당하는 뇌신경은 제12뇌신경인 ( )이다.", "answer": "혀밑신경 (hypoglossal nerve)" },
+        { "question": "심장의 전기 전도 시스템에서 심방을 수축시키는 신호를 처음으로 만들어내는 곳은 ( )이다.", "answer": "굴심방결절 (SA node)" },
     ]
 };
