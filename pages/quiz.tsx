@@ -1,9 +1,11 @@
+// pages/quiz.tsx (혹은 해당 파일 경로)
+
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/router"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { quizByCategory } from "../data/questions"
-import QuizCard from "../components/QuizCard"
+import QuizView from "../components/QuizView" // 새로 만든 컴포넌트 import
 
 function shuffle<T>(arr: T[]) {
     return [...arr].sort(() => Math.random() - 0.5)
@@ -41,6 +43,7 @@ export default function QuizPage() {
         return idxs.map((i) => allData[i])
     }, [allData, onlyUnknown])
 
+    // --- 상태 관리 로직은 그대로 유지 ---
     const [phase, setPhase] = useState<Phase>("select")
     const [quizData, setQuizData] = useState<QA[]>([])
     const [current, setCurrent] = useState(0)
@@ -48,6 +51,7 @@ export default function QuizPage() {
     const [wrongSet, setWrongSet] = useState<QA[]>([])
     const [selectedOption, setSelectedOption] = useState<string | null>(null)
 
+    // --- 데이터 준비 및 라우팅 관련 useEffect 들도 그대로 유지 ---
     useEffect(() => {
         if (!allData.length && category && rawSub) {
             alert("해당 카테고리에 데이터가 없습니다.")
@@ -63,6 +67,7 @@ export default function QuizPage() {
         setPhase("learn")
     }, [allData, modeParam, phase, filteredData])
 
+    // --- 핵심 로직 함수들도 그대로 유지 ---
     const goToNextQuestion = useCallback(() => {
         setShowAnswer(false)
         setSelectedOption(null)
@@ -85,16 +90,13 @@ export default function QuizPage() {
     }, [current, goToNextQuestion, quizData])
 
     const handleOptionSelect = useCallback((option: string) => {
-        // 이미 답이 공개된 상태 (두 번째 클릭)
         if (showAnswer) {
-            // 이전에 선택했던 옵션을 다시 클릭했을 때만 다음 문제로 넘어감
             if (option === selectedOption) {
                 goToNextQuestion();
             }
-            return; // 다른 옵션을 클릭하면 아무것도 하지 않음
+            return;
         }
 
-        // 첫 번째 클릭: 답을 확인하는 로직
         const isCorrect = option === quizData[current].answer;
         setSelectedOption(option);
         setShowAnswer(true);
@@ -143,6 +145,8 @@ export default function QuizPage() {
             typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
         )
 
+    // --- 렌더링 로직: phase에 따라 적절한 UI를 렌더링 ---
+
     if (phase === "select" || quizData.length === 0) {
         return (
             <main className="min-h-screen flex items-center justify-center bg-white">
@@ -151,9 +155,26 @@ export default function QuizPage() {
         )
     }
 
-    // --- 요청하신 'done' 단계 UI 코드 복원 ---
+    if (phase === "learn") {
+        return (
+            <QuizView
+                quizData={quizData}
+                current={current}
+                showAnswer={showAnswer}
+                selectedOption={selectedOption}
+                wrongSet={wrongSet}
+                onOptionSelect={handleOptionSelect}
+                onShowAnswer={() => setShowAnswer(true)}
+                onGoToNext={goToNextQuestion}
+                onMarkAsWrong={handleDontKnow}
+            />
+        )
+    }
+
     if (phase === "done") {
         const cleared = wrongSet.length === 0
+        // 'done' 단계 UI도 별도 컴포넌트로 분리하면 더 좋습니다.
+        // 여기서는 기존 코드를 그대로 사용합니다.
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-emerald-200 p-6">
                 <Card className="w-full max-w-lg flex flex-col">
@@ -203,72 +224,6 @@ export default function QuizPage() {
             </div>
         )
     }
-    // --- 'done' UI 코드 끝 ---
 
-    const total = quizData.length
-    const progress = Math.round(((current + 1) / total) * 100)
-    const qa = quizData[current]
-    const isMultipleChoice = qa.options && qa.options.length > 0;
-
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6 flex items-center justify-center">
-            <Card className="w-full max-w-lg flex flex-col h-[80vh]">
-                <CardContent className="flex flex-col flex-grow p-4 md:p-6">
-                    <div className="mb-4">
-                        <p className="font-semibold text-gray-700 mb-1">
-                            문제 {current + 1} / {total}
-                        </p>
-                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-2 rounded-full bg-blue-500 transition-all" style={{ width: `${progress}%` }} />
-                        </div>
-                    </div>
-                    <div className="flex-grow overflow-auto mb-4">
-                        <QuizCard
-                            question={qa.question}
-                            answer={qa.answer}
-                            options={qa.options}
-                            showAnswer={showAnswer}
-                            selectedOption={selectedOption}
-                            onOptionSelect={handleOptionSelect}
-                        />
-                    </div>
-                </CardContent>
-                <div className="p-4 border-t bg-white">
-                    <div className="flex space-x-4">
-                        {isMultipleChoice ? (
-                            showAnswer ? (
-                                <>
-                                    <Button size="lg" variant="destructive" onClick={handleDontKnow} className="flex-1">
-                                        몰랐던 문제로 저장
-                                    </Button>
-                                    <Button size="lg" variant="default" onClick={goToNextQuestion} className="flex-1">
-                                        다음 문제
-                                    </Button>
-                                </>
-                            ) : (
-                                <div className="text-center w-full text-gray-500">
-                                    선지를 선택해주세요.
-                                </div>
-                            )
-                        ) : (
-                            !showAnswer ? (
-                                <Button size="lg" onClick={() => setShowAnswer(true)} className="flex-1">
-                                    정답 보기
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button size="lg" variant="destructive" onClick={handleDontKnow} className="flex-1">
-                                        모른다
-                                    </Button>
-                                    <Button size="lg" variant="default" onClick={goToNextQuestion} className="flex-1">
-                                        안다
-                                    </Button>
-                                </>
-                            )
-                        )}
-                    </div>
-                </div>
-            </Card>
-        </div>
-    )
+    return null; // 모든 phase에 해당하지 않는 경우
 }
