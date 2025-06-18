@@ -1,11 +1,11 @@
-// pages/quiz.tsx (혹은 해당 파일 경로)
+// pages/quiz.tsx (수정된 전체 코드)
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/router"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { quizByCategory } from "../data/questions"
-import QuizView from "../components/QuizView" // 새로 만든 컴포넌트 import
+import QuizView from "../components/QuizView"
 
 function shuffle<T>(arr: T[]) {
     return [...arr].sort(() => Math.random() - 0.5)
@@ -43,7 +43,7 @@ export default function QuizPage() {
         return idxs.map((i) => allData[i])
     }, [allData, onlyUnknown])
 
-    // --- 상태 관리 로직은 그대로 유지 ---
+    // --- 상태 관리 로직 ---
     const [phase, setPhase] = useState<Phase>("select")
     const [quizData, setQuizData] = useState<QA[]>([])
     const [current, setCurrent] = useState(0)
@@ -51,7 +51,7 @@ export default function QuizPage() {
     const [wrongSet, setWrongSet] = useState<QA[]>([])
     const [selectedOption, setSelectedOption] = useState<string | null>(null)
 
-    // --- 데이터 준비 및 라우팅 관련 useEffect 들도 그대로 유지 ---
+    // --- 데이터 준비 및 라우팅 관련 useEffect ---
     useEffect(() => {
         if (!allData.length && category && rawSub) {
             alert("해당 카테고리에 데이터가 없습니다.")
@@ -67,7 +67,27 @@ export default function QuizPage() {
         setPhase("learn")
     }, [allData, modeParam, phase, filteredData])
 
-    // --- 핵심 로직 함수들도 그대로 유지 ---
+    // ▼▼▼ 로직 정의 순서가 매우 중요합니다 ▼▼▼
+
+    // 1. 현재 문제 데이터를 가져옵니다.
+    const currentQA = quizData.length > 0 ? quizData[current] : null
+
+    // 2. 정답 문자열을 배열로 먼저 변환합니다.
+    const correctAnswersArray = useMemo(() => {
+        if (!currentQA) return []
+        return currentQA.answer.split(" / ").map((a) => a.trim())
+    }, [currentQA])
+
+    // 3. 섞인 선택지 목록을 만듭니다.
+    const shuffledOptions = useMemo(() => {
+        if (!currentQA || !currentQA.options) {
+            return null
+        }
+        const allOptions = [...correctAnswersArray, ...currentQA.options]
+        return shuffle(Array.from(new Set(allOptions)))
+    }, [currentQA, correctAnswersArray])
+
+    // 4. 위에서 만든 데이터(correctAnswersArray)에 의존하는 함수들을 이제 정의합니다.
     const goToNextQuestion = useCallback(() => {
         setShowAnswer(false)
         setSelectedOption(null)
@@ -81,6 +101,29 @@ export default function QuizPage() {
         })
     }, [quizData.length])
 
+    const handleOptionSelect = useCallback(
+        (option: string) => {
+            if (showAnswer) {
+                if (option === selectedOption) {
+                    goToNextQuestion()
+                }
+                return
+            }
+
+            const isCorrect = correctAnswersArray.includes(option)
+            setSelectedOption(option)
+            setShowAnswer(true)
+
+            if (!isCorrect) {
+                const q = quizData[current]
+                setWrongSet((prev) =>
+                    prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+                )
+            }
+        },
+        [showAnswer, selectedOption, quizData, current, goToNextQuestion, correctAnswersArray]
+    )
+
     const handleDontKnow = useCallback(() => {
         const q = quizData[current]
         setWrongSet((prev) =>
@@ -89,34 +132,14 @@ export default function QuizPage() {
         goToNextQuestion()
     }, [current, goToNextQuestion, quizData])
 
-    const handleOptionSelect = useCallback((option: string) => {
-        if (showAnswer) {
-            if (option === selectedOption) {
-                goToNextQuestion();
-            }
-            return;
-        }
-
-        const isCorrect = option === quizData[current].answer;
-        setSelectedOption(option);
-        setShowAnswer(true);
-
-        if (!isCorrect) {
-            const q = quizData[current];
-            setWrongSet((prev) =>
-                prev.some((x) => x.question === q.question) ? prev : [...prev, q]
-            );
-        }
-    }, [showAnswer, selectedOption, quizData, current, goToNextQuestion]);
-
     useEffect(() => {
         if (phase !== "learn") return
 
         const onKey = (e: KeyboardEvent) => {
-            const qa = quizData[current];
-            const isMultipleChoice = qa.options && qa.options.length > 0;
+            const qa = quizData[current]
+            const isMultipleChoice = qa.options && qa.options.length > 0
 
-            if (isMultipleChoice) return;
+            if (isMultipleChoice) return
 
             if (!showAnswer) {
                 setShowAnswer(true)
@@ -145,19 +168,9 @@ export default function QuizPage() {
             typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
         )
 
-    const currentQA = quizData.length > 0 ? quizData[current] : null
+    // --- 렌더링 로직 ---
 
-    const shuffledOptions = useMemo(() => {
-        if (!currentQA || !currentQA.options) {
-            return null // 주관식 문제이거나 데이터가 없는 경우
-        }
-        // 정답과 오답 선택지를 합친 후 중복을 제거하고 섞습니다.
-        const allOptions = [currentQA.answer, ...currentQA.options]
-        return shuffle(Array.from(new Set(allOptions)))
-    }, [currentQA]) // 현재 문제가 바뀔 때만 다시 계산합니다.
-    // --- 렌더링 로직: phase에 따라 적절한 UI를 렌더링 ---
-
-    if (phase === "select" || quizData.length === 0) {
+    if (phase === "select" || !currentQA) {
         return (
             <main className="min-h-screen flex items-center justify-center bg-white">
                 <p className="animate-pulse text-gray-400">문제를 불러오는 중…</p>
@@ -173,7 +186,8 @@ export default function QuizPage() {
                 showAnswer={showAnswer}
                 selectedOption={selectedOption}
                 wrongSet={wrongSet}
-                shuffledOptions={shuffledOptions} // <<< 이 줄을 추가하세요
+                shuffledOptions={shuffledOptions}
+                correctAnswers={correctAnswersArray}
                 onOptionSelect={handleOptionSelect}
                 onShowAnswer={() => setShowAnswer(true)}
                 onGoToNext={goToNextQuestion}
@@ -184,8 +198,6 @@ export default function QuizPage() {
 
     if (phase === "done") {
         const cleared = wrongSet.length === 0
-        // 'done' 단계 UI도 별도 컴포넌트로 분리하면 더 좋습니다.
-        // 여기서는 기존 코드를 그대로 사용합니다.
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-emerald-200 p-6">
                 <Card className="w-full max-w-lg flex flex-col">
@@ -236,5 +248,5 @@ export default function QuizPage() {
         )
     }
 
-    return null; // 모든 phase에 해당하지 않는 경우
+    return null
 }

@@ -1,19 +1,26 @@
+// src/components/QuizCard.tsx (수정된 전체 코드)
 
-// QuizCard.tsx
-
-import React from 'react';
+import React from 'react'
+import { Button } from './ui/button' // shadcn/ui Button을 사용한다고 가정
 
 interface QuizCardProps {
-    question: string;
-    answer: string;
-    options?: string[] | null;
-    showAnswer: boolean;
-    selectedOption: string | null;
-    onOptionSelect: (option: string) => void;
+    question: string
+    correctAnswers: string[] // 1. 타입을 string[]로 명시
+    options?: string[] | null
+    showAnswer: boolean
+    selectedOption: string | null
+    onOptionSelect: (option: string) => void
 }
 
-export default function QuizCard({ question, answer, options, showAnswer, selectedOption, onOptionSelect }: QuizCardProps) {
-    const isMultipleChoice = options && options.length > 0;
+export default function QuizCard({
+    question,
+    correctAnswers, // 2. 불필요한 쉼표 제거
+    options,
+    showAnswer,
+    selectedOption,
+    onOptionSelect,
+}: QuizCardProps) {
+    const isMultipleChoice = options && options.length > 0
 
     return (
         <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-inner flex flex-col flex-grow">
@@ -27,49 +34,43 @@ export default function QuizCard({ question, answer, options, showAnswer, select
                 <div className="mb-6">
                     <ul className="space-y-3">
                         {options.map((option, index) => {
-                            let optionClass = 'text-gray-700';
+                            // --- 3. 정답 확인 및 스타일링 로직 수정 ---
+                            const isCorrect = correctAnswers.includes(option)
+                            const isSelected = option === selectedOption
 
-                            // --- 여기부터 스타일 로직 변경 ---
-                            let cursorClass = 'cursor-default'; // 기본적으로는 클릭 비활성화
+                            let variant: 'default' | 'destructive' | 'secondary' | 'outline' = 'outline'
+                            let cursorClass = 'cursor-pointer'
 
                             if (showAnswer) {
-                                if (option === answer) {
-                                    optionClass = 'bg-green-100 text-green-800 font-semibold border-green-400';
-                                } else if (option === selectedOption) {
-                                    optionClass = 'bg-red-100 text-red-800 font-semibold border-red-400';
-                                } else {
-                                    optionClass = 'text-gray-500 border-gray-200';
+                                cursorClass = 'cursor-default' // 정답 공개 후엔 기본적으로 클릭 비활성화
+                                if (isCorrect) {
+                                    variant = 'secondary' // 정답인 모든 보기는 초록색 계열로
                                 }
-
-                                // 답이 공개된 후, 내가 선택했던 옵션에만 포인터 커서를 표시
-                                if (option === selectedOption) {
-                                    cursorClass = 'cursor-pointer hover:opacity-80';
+                                if (isSelected && !isCorrect) {
+                                    variant = 'destructive' // 내가 선택한 오답은 빨간색 계열로
                                 }
-
-                            } else {
-                                // 답을 보기 전에는 모든 옵션이 클릭 가능
-                                optionClass = 'text-gray-700 hover:bg-gray-100 hover:border-gray-400 border-gray-200';
-                                cursorClass = 'cursor-pointer';
+                                // 내가 선택한 옵션만 다시 클릭(다음으로 넘어가기) 가능하도록 커서 변경
+                                if (isSelected) {
+                                    cursorClass = 'cursor-pointer hover:opacity-80'
+                                }
                             }
-                            // --- 여기까지 스타일 로직 변경 ---
 
                             return (
-                                <li
-                                    key={index}
-                                    // onClick에서 !showAnswer 조건 제거
-                                    onClick={() => onOptionSelect(option)}
-                                    className={`
-                                        text-lg py-3 px-4 rounded-lg transition-all duration-200 border
-                                        ${optionClass}
-                                        ${cursorClass}
-                                    `}
-                                >
-                                    <span className="font-medium mr-3">
-                                        {String.fromCharCode(65 + index)}.
-                                    </span>
-                                    {option}
+                                // shadcn/ui의 Button 컴포넌트를 사용하면 스타일링이 더 일관됩니다.
+                                <li key={index}>
+                                    <Button
+                                        variant={variant}
+                                        onClick={() => onOptionSelect(option)}
+                                        className={`w-full h-auto text-lg justify-start py-3 px-4 ${cursorClass}`}
+                                        disabled={showAnswer && !isSelected} // 정답 공개 후 선택한 것 외엔 비활성화
+                                    >
+                                        <span className="font-medium mr-3 text-left">
+                                            {String.fromCharCode(65 + index)}.
+                                        </span>
+                                        <span className="text-left whitespace-normal">{option}</span>
+                                    </Button>
                                 </li>
-                            );
+                            )
                         })}
                     </ul>
                 </div>
@@ -80,11 +81,10 @@ export default function QuizCard({ question, answer, options, showAnswer, select
             {showAnswer && !isMultipleChoice && (
                 <div className="mt-auto">
                     <p className="text-gray-800 font-semibold text-xl tracking-wide">
-                        정답: <span className="text-green-600 text-xl tracking-wider">{answer}</span>
+                        정답: <span className="text-green-600 text-xl tracking-wider">{correctAnswers.join(' / ')}</span>
                     </p>
                 </div>
             )}
         </div>
-
-    );
+    )
 }

@@ -14,6 +14,8 @@ interface QuizViewProps {
     selectedOption: string | null
     wrongSet: QA[]
     shuffledOptions: string[] | null
+    correctAnswers: string[] // <<< 이 줄을 추가하세요
+
     onOptionSelect: (option: string) => void
     onShowAnswer: () => void
     onGoToNext: () => void
@@ -27,6 +29,7 @@ const QuizView = ({
     selectedOption,
     wrongSet,
     shuffledOptions,
+    correctAnswers, // <<< 파라미터로 받기
     onOptionSelect,
     onShowAnswer,
     onGoToNext,
@@ -59,7 +62,7 @@ const QuizView = ({
                             <div className="flex-grow overflow-auto mb-4">
                                 <QuizCard
                                     question={qa.question}
-                                    answer={qa.answer}
+                                    correctAnswers={correctAnswers} // <<< 이 줄로 교체
                                     options={shuffledOptions}
                                     showAnswer={showAnswer}
                                     selectedOption={selectedOption}
