@@ -11,6 +11,7 @@ import { sanghanQuiz } from "./sanghanQuiz";
 import { moderntest } from "./moderntest";
 import { bonconum } from "./bonconum";
 import { anatomtest } from "./anatomtest";
+import { acupunctureQuiz } from "./acupunctureQuiz";
 
 
 
@@ -28,5 +29,7 @@ export const quizByCategory: {
     상한_객관식_주관식: sanghanQuiz,
     양방생리_기출만: moderntest,
     본초_객관식: bonconum,
-    해부_단답: anatomtest
+    해부_단답: anatomtest,
+    경혈: acupunctureQuiz,
+
 };
