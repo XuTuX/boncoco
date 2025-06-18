@@ -1,23 +1,27 @@
 // src/components/QuizCard.tsx (수정된 전체 코드)
 
 import React from 'react'
-import { Button } from './ui/button' // shadcn/ui Button을 사용한다고 가정
 
+// <<< Props 타입을 최신 로직에 맞게 정확히 수정
 interface QuizCardProps {
     question: string
-    correctAnswers: string[] // 1. 타입을 string[]로 명시
+    correctAnswers: string[]
     options?: string[] | null
     showAnswer: boolean
+    isMultiAnswerQuestion: boolean
     selectedOption: string | null
+    selectedOptions: string[]
     onOptionSelect: (option: string) => void
 }
 
 export default function QuizCard({
     question,
-    correctAnswers, // 2. 불필요한 쉼표 제거
+    correctAnswers,
     options,
     showAnswer,
+    isMultiAnswerQuestion, // <<< 파라미터로 받기
     selectedOption,
+    selectedOptions,
     onOptionSelect,
 }: QuizCardProps) {
     const isMultipleChoice = options && options.length > 0
@@ -34,41 +38,53 @@ export default function QuizCard({
                 <div className="mb-6">
                     <ul className="space-y-3">
                         {options.map((option, index) => {
-                            // --- 3. 정답 확인 및 스타일링 로직 수정 ---
                             const isCorrect = correctAnswers.includes(option)
-                            const isSelected = option === selectedOption
 
-                            let variant: 'default' | 'destructive' | 'secondary' | 'outline' = 'outline'
+                            // <<< 여기가 핵심! 문제 유형에 따라 isSelected를 다르게 계산
+                            const isSelected = isMultiAnswerQuestion
+                                ? selectedOptions.includes(option)
+                                : selectedOption === option
+
+                            let stateClasses = ''
                             let cursorClass = 'cursor-pointer'
 
                             if (showAnswer) {
-                                cursorClass = 'cursor-default' // 정답 공개 후엔 기본적으로 클릭 비활성화
+                                // --- 정답 공개 후 스타일링 ---
+                                cursorClass = 'cursor-default'
                                 if (isCorrect) {
-                                    variant = 'secondary' // 정답인 모든 보기는 초록색 계열로
+                                    stateClasses = 'bg-green-100 text-green-800 font-semibold border-green-400'
+                                } else if (isSelected && !isCorrect) {
+                                    stateClasses = 'bg-red-100 text-red-800 font-semibold border-red-400'
+                                } else {
+                                    stateClasses = 'text-gray-500 border-gray-200'
                                 }
-                                if (isSelected && !isCorrect) {
-                                    variant = 'destructive' // 내가 선택한 오답은 빨간색 계열로
-                                }
-                                // 내가 선택한 옵션만 다시 클릭(다음으로 넘어가기) 가능하도록 커서 변경
-                                if (isSelected) {
+                                // 단일 정답 문제에서만, 다음으로 넘어가는 클릭 기능 활성화
+                                if (!isMultiAnswerQuestion && isSelected) {
                                     cursorClass = 'cursor-pointer hover:opacity-80'
+                                }
+                            } else {
+                                // --- 정답 공개 전 스타일링 ---
+                                if (isSelected) {
+                                    stateClasses = 'bg-blue-100 text-blue-800 border-blue-400 font-semibold'
+                                } else {
+                                    stateClasses = 'text-gray-700 hover:bg-gray-100 hover:border-gray-400 border-gray-200'
                                 }
                             }
 
                             return (
-                                // shadcn/ui의 Button 컴포넌트를 사용하면 스타일링이 더 일관됩니다.
-                                <li key={index}>
-                                    <Button
-                                        variant={variant}
-                                        onClick={() => onOptionSelect(option)}
-                                        className={`w-full h-auto text-lg justify-start py-3 px-4 ${cursorClass}`}
-                                        disabled={showAnswer && !isSelected} // 정답 공개 후 선택한 것 외엔 비활성화
-                                    >
-                                        <span className="font-medium mr-3 text-left">
-                                            {String.fromCharCode(65 + index)}.
-                                        </span>
-                                        <span className="text-left whitespace-normal">{option}</span>
-                                    </Button>
+                                <li
+                                    key={index}
+                                    onClick={() => onOptionSelect(option)}
+                                    className={`
+                                        text-lg py-3 px-4 rounded-lg transition-all duration-200 border
+                                        ${stateClasses}
+                                        ${cursorClass}
+                                    `}
+                                >
+                                    <span className="font-medium mr-3">
+                                        {String.fromCharCode(65 + index)}.
+                                    </span>
+                                    {option}
                                 </li>
                             )
                         })}

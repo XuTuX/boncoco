@@ -50,6 +50,7 @@ export default function QuizPage() {
     const [showAnswer, setShowAnswer] = useState(false)
     const [wrongSet, setWrongSet] = useState<QA[]>([])
     const [selectedOption, setSelectedOption] = useState<string | null>(null)
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
     // --- 데이터 준비 및 라우팅 관련 useEffect ---
     useEffect(() => {
@@ -67,30 +68,26 @@ export default function QuizPage() {
         setPhase("learn")
     }, [allData, modeParam, phase, filteredData])
 
-    // ▼▼▼ 로직 정의 순서가 매우 중요합니다 ▼▼▼
-
-    // 1. 현재 문제 데이터를 가져옵니다.
+    // --- 데이터 및 함수 정의 (순서 중요) ---
     const currentQA = quizData.length > 0 ? quizData[current] : null
 
-    // 2. 정답 문자열을 배열로 먼저 변환합니다.
     const correctAnswersArray = useMemo(() => {
         if (!currentQA) return []
         return currentQA.answer.split(" / ").map((a) => a.trim())
     }, [currentQA])
 
-    // 3. 섞인 선택지 목록을 만듭니다.
     const shuffledOptions = useMemo(() => {
-        if (!currentQA || !currentQA.options) {
-            return null
-        }
+        if (!currentQA || !currentQA.options) return null
         const allOptions = [...correctAnswersArray, ...currentQA.options]
         return shuffle(Array.from(new Set(allOptions)))
     }, [currentQA, correctAnswersArray])
 
-    // 4. 위에서 만든 데이터(correctAnswersArray)에 의존하는 함수들을 이제 정의합니다.
+    const isMultiAnswerQuestion = correctAnswersArray.length > 1
+
     const goToNextQuestion = useCallback(() => {
         setShowAnswer(false)
         setSelectedOption(null)
+        setSelectedOptions([])
         setCurrent((prev) => {
             const next = prev + 1
             if (next >= quizData.length) {
@@ -104,25 +101,49 @@ export default function QuizPage() {
     const handleOptionSelect = useCallback(
         (option: string) => {
             if (showAnswer) {
-                if (option === selectedOption) {
+                if (!isMultiAnswerQuestion && option === selectedOption) {
                     goToNextQuestion()
                 }
                 return
             }
 
-            const isCorrect = correctAnswersArray.includes(option)
-            setSelectedOption(option)
-            setShowAnswer(true)
-
-            if (!isCorrect) {
-                const q = quizData[current]
-                setWrongSet((prev) =>
-                    prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+            if (isMultiAnswerQuestion) {
+                setSelectedOptions((prev) =>
+                    prev.includes(option)
+                        ? prev.filter((item) => item !== option)
+                        : [...prev, option]
                 )
+            } else {
+                setSelectedOption(option)
+                setShowAnswer(true)
+                const isCorrect = correctAnswersArray.includes(option)
+                if (!isCorrect) {
+                    const q = quizData[current]
+                    setWrongSet((prev) =>
+                        prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+                    )
+                }
             }
         },
-        [showAnswer, selectedOption, quizData, current, goToNextQuestion, correctAnswersArray]
+        [showAnswer, isMultiAnswerQuestion, selectedOption, correctAnswersArray, quizData, current, goToNextQuestion]
     )
+
+    const handleCheckAnswers = useCallback(() => {
+        if (!isMultiAnswerQuestion || selectedOptions.length === 0) return
+
+        const isCorrect =
+            selectedOptions.length === correctAnswersArray.length &&
+            selectedOptions.every((opt) => correctAnswersArray.includes(opt))
+
+        setShowAnswer(true)
+
+        if (!isCorrect) {
+            const q = quizData[current]
+            setWrongSet((prev) =>
+                prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+            )
+        }
+    }, [isMultiAnswerQuestion, selectedOptions, correctAnswersArray, quizData, current])
 
     const handleDontKnow = useCallback(() => {
         const q = quizData[current]
@@ -134,13 +155,10 @@ export default function QuizPage() {
 
     useEffect(() => {
         if (phase !== "learn") return
-
         const onKey = (e: KeyboardEvent) => {
             const qa = quizData[current]
             const isMultipleChoice = qa.options && qa.options.length > 0
-
             if (isMultipleChoice) return
-
             if (!showAnswer) {
                 setShowAnswer(true)
             } else {
@@ -148,7 +166,6 @@ export default function QuizPage() {
                 else if (e.key === "ArrowLeft") handleDontKnow()
             }
         }
-
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
     }, [phase, showAnswer, goToNextQuestion, handleDontKnow, quizData, current])
@@ -160,16 +177,14 @@ export default function QuizPage() {
         setCurrent(0)
         setShowAnswer(false)
         setSelectedOption(null)
+        setSelectedOptions([])
         setPhase("learn")
     }
 
     const goHome = () =>
-        router.replace(
-            typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
-        )
+        router.replace(typeof category === "string" ? `/${encodeURIComponent(category)}` : "/")
 
     // --- 렌더링 로직 ---
-
     if (phase === "select" || !currentQA) {
         return (
             <main className="min-h-screen flex items-center justify-center bg-white">
@@ -184,14 +199,15 @@ export default function QuizPage() {
                 quizData={quizData}
                 current={current}
                 showAnswer={showAnswer}
+                isMultiAnswerQuestion={isMultiAnswerQuestion}
                 selectedOption={selectedOption}
+                selectedOptions={selectedOptions}
                 wrongSet={wrongSet}
                 shuffledOptions={shuffledOptions}
                 correctAnswers={correctAnswersArray}
                 onOptionSelect={handleOptionSelect}
-                onShowAnswer={() => setShowAnswer(true)}
                 onGoToNext={goToNextQuestion}
-                onMarkAsWrong={handleDontKnow}
+                onCheckAnswers={handleCheckAnswers}
             />
         )
     }

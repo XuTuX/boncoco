@@ -1,4 +1,4 @@
-// src/components/QuizView.tsx
+// src/components/QuizView.tsx (수정된 전체 코드)
 
 import { Button } from "./ui/button"
 import { Card, CardContent } from "./ui/card"
@@ -7,39 +7,39 @@ import WrongAnswerList from "./WrongAnswerList"
 
 type QA = { question: string; answer: string; options?: string[] }
 
+// <<< Props 타입을 최신 로직에 맞게 정확히 수정
 interface QuizViewProps {
     quizData: QA[]
     current: number
     showAnswer: boolean
+    isMultiAnswerQuestion: boolean
     selectedOption: string | null
+    selectedOptions: string[]
     wrongSet: QA[]
     shuffledOptions: string[] | null
-    correctAnswers: string[] // <<< 이 줄을 추가하세요
-
+    correctAnswers: string[]
     onOptionSelect: (option: string) => void
-    onShowAnswer: () => void
     onGoToNext: () => void
-    onMarkAsWrong: () => void
+    onCheckAnswers: () => void
 }
 
 const QuizView = ({
     quizData,
     current,
     showAnswer,
+    isMultiAnswerQuestion, // <<< 파라미터로 받기
     selectedOption,
+    selectedOptions,
     wrongSet,
     shuffledOptions,
-    correctAnswers, // <<< 파라미터로 받기
+    correctAnswers,
     onOptionSelect,
-    onShowAnswer,
     onGoToNext,
-    onMarkAsWrong,
+    onCheckAnswers,
 }: QuizViewProps) => {
     const total = quizData.length
     const progress = Math.round(((current + 1) / total) * 100)
     const qa = quizData[current]
-    // ▼▼▼ 이 부분을 수정했습니다 ▼▼▼
-    const isMultipleChoice = !!shuffledOptions
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 lg:p-8">
@@ -60,66 +60,42 @@ const QuizView = ({
                                 </div>
                             </div>
                             <div className="flex-grow overflow-auto mb-4">
+                                {/* <<< QuizCard에 필요한 모든 Props를 전달 */}
                                 <QuizCard
                                     question={qa.question}
-                                    correctAnswers={correctAnswers} // <<< 이 줄로 교체
+                                    correctAnswers={correctAnswers}
                                     options={shuffledOptions}
                                     showAnswer={showAnswer}
+                                    isMultiAnswerQuestion={isMultiAnswerQuestion}
                                     selectedOption={selectedOption}
+                                    selectedOptions={selectedOptions}
                                     onOptionSelect={onOptionSelect}
                                 />
                             </div>
                         </CardContent>
+
                         <div className="p-4 border-t bg-white">
                             <div className="flex space-x-4">
-                                {isMultipleChoice ? (
-                                    showAnswer ? (
-                                        <>
-                                            <Button
-                                                size="lg"
-                                                variant="destructive"
-                                                onClick={onMarkAsWrong}
-                                                className="flex-1"
-                                            >
-                                                몰랐던 문제로 저장
-                                            </Button>
-                                            <Button
-                                                size="lg"
-                                                variant="default"
-                                                onClick={onGoToNext}
-                                                className="flex-1"
-                                            >
-                                                다음 문제
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <div className="text-center w-full text-gray-500">
-                                            선지를 선택해주세요.
-                                        </div>
-                                    )
-                                ) : !showAnswer ? (
-                                    <Button size="lg" onClick={onShowAnswer} className="flex-1">
-                                        정답 보기
+                                {showAnswer ? (
+                                    // 1. 정답이 공개된 후
+                                    <Button size="lg" onClick={onGoToNext} className="flex-1">
+                                        다음 문제
+                                    </Button>
+                                ) : isMultiAnswerQuestion ? (
+                                    // 2. 정답 공개 전 & 복수 정답 문제
+                                    <Button
+                                        size="lg"
+                                        onClick={onCheckAnswers}
+                                        disabled={selectedOptions.length === 0}
+                                        className="flex-1"
+                                    >
+                                        정답 확인
                                     </Button>
                                 ) : (
-                                    <>
-                                        <Button
-                                            size="lg"
-                                            variant="destructive"
-                                            onClick={onMarkAsWrong}
-                                            className="flex-1"
-                                        >
-                                            모른다
-                                        </Button>
-                                        <Button
-                                            size="lg"
-                                            variant="default"
-                                            onClick={onGoToNext}
-                                            className="flex-1"
-                                        >
-                                            안다
-                                        </Button>
-                                    </>
+                                    // 3. 정답 공개 전 & 단일 정답 문제
+                                    <div className="text-center w-full text-gray-500">
+                                        선지를 선택해주세요.
+                                    </div>
                                 )}
                             </div>
                         </div>
