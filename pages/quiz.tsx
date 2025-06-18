@@ -145,6 +145,16 @@ export default function QuizPage() {
             typeof category === "string" ? `/${encodeURIComponent(category)}` : "/"
         )
 
+    const currentQA = quizData.length > 0 ? quizData[current] : null
+
+    const shuffledOptions = useMemo(() => {
+        if (!currentQA || !currentQA.options) {
+            return null // 주관식 문제이거나 데이터가 없는 경우
+        }
+        // 정답과 오답 선택지를 합친 후 중복을 제거하고 섞습니다.
+        const allOptions = [currentQA.answer, ...currentQA.options]
+        return shuffle(Array.from(new Set(allOptions)))
+    }, [currentQA]) // 현재 문제가 바뀔 때만 다시 계산합니다.
     // --- 렌더링 로직: phase에 따라 적절한 UI를 렌더링 ---
 
     if (phase === "select" || quizData.length === 0) {
@@ -163,6 +173,7 @@ export default function QuizPage() {
                 showAnswer={showAnswer}
                 selectedOption={selectedOption}
                 wrongSet={wrongSet}
+                shuffledOptions={shuffledOptions} // <<< 이 줄을 추가하세요
                 onOptionSelect={handleOptionSelect}
                 onShowAnswer={() => setShowAnswer(true)}
                 onGoToNext={goToNextQuestion}

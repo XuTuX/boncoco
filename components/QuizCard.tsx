@@ -6,7 +6,7 @@ import React from 'react';
 interface QuizCardProps {
     question: string;
     answer: string;
-    options?: string[];
+    options?: string[] | null;
     showAnswer: boolean;
     selectedOption: string | null;
     onOptionSelect: (option: string) => void;

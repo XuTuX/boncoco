@@ -13,6 +13,7 @@ interface QuizViewProps {
     showAnswer: boolean
     selectedOption: string | null
     wrongSet: QA[]
+    shuffledOptions: string[] | null
     onOptionSelect: (option: string) => void
     onShowAnswer: () => void
     onGoToNext: () => void
@@ -25,6 +26,7 @@ const QuizView = ({
     showAnswer,
     selectedOption,
     wrongSet,
+    shuffledOptions,
     onOptionSelect,
     onShowAnswer,
     onGoToNext,
@@ -33,7 +35,8 @@ const QuizView = ({
     const total = quizData.length
     const progress = Math.round(((current + 1) / total) * 100)
     const qa = quizData[current]
-    const isMultipleChoice = qa.options && qa.options.length > 0
+    // ▼▼▼ 이 부분을 수정했습니다 ▼▼▼
+    const isMultipleChoice = !!shuffledOptions
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 lg:p-8">
@@ -57,7 +60,7 @@ const QuizView = ({
                                 <QuizCard
                                     question={qa.question}
                                     answer={qa.answer}
-                                    options={qa.options}
+                                    options={shuffledOptions}
                                     showAnswer={showAnswer}
                                     selectedOption={selectedOption}
                                     onOptionSelect={onOptionSelect}
