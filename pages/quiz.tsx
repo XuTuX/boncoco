@@ -1,4 +1,4 @@
-// pages/quiz.tsx (수정된 전체 코드)
+// pages/quiz.tsx (최종 전체 코드)
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/router"
@@ -7,10 +7,12 @@ import { Card, CardContent } from "../components/ui/card"
 import { quizByCategory } from "../data/questions"
 import QuizView from "../components/QuizView"
 
+// 유틸리티 함수
 function shuffle<T>(arr: T[]) {
     return [...arr].sort(() => Math.random() - 0.5)
 }
 
+// 타입 정의
 type QA = { question: string; answer: string; options?: string[] }
 type Phase = "select" | "learn" | "done"
 
@@ -21,6 +23,7 @@ export default function QuizPage() {
     const modeParam: "ordered" | "random" =
         Array.isArray(mode) ? "ordered" : mode === "random" ? "random" : "ordered"
 
+    // --- 데이터 처리 로직 ---
     const allData: QA[] = useMemo(() => {
         if (typeof category !== "string" || typeof rawSub !== "string") return []
         const group = quizByCategory[category]
@@ -43,7 +46,7 @@ export default function QuizPage() {
         return idxs.map((i) => allData[i])
     }, [allData, onlyUnknown])
 
-    // --- 상태 관리 로직 ---
+    // --- 상태 관리 ---
     const [phase, setPhase] = useState<Phase>("select")
     const [quizData, setQuizData] = useState<QA[]>([])
     const [current, setCurrent] = useState(0)
@@ -62,13 +65,13 @@ export default function QuizPage() {
 
     useEffect(() => {
         if (!allData.length || phase !== "select") return
-        const base = filteredData
+        const base = filteredData.length > 0 ? filteredData : allData
         const final = modeParam === "random" ? shuffle(base) : base
         setQuizData(final)
         setPhase("learn")
     }, [allData, modeParam, phase, filteredData])
 
-    // --- 데이터 및 함수 정의 (순서 중요) ---
+    // --- 현재 문제 관련 데이터 정의 ---
     const currentQA = quizData.length > 0 ? quizData[current] : null
 
     const correctAnswersArray = useMemo(() => {
@@ -84,6 +87,7 @@ export default function QuizPage() {
 
     const isMultiAnswerQuestion = correctAnswersArray.length > 1
 
+    // --- 핵심 로직 함수들 ---
     const goToNextQuestion = useCallback(() => {
         setShowAnswer(false)
         setSelectedOption(null)
@@ -98,6 +102,26 @@ export default function QuizPage() {
         })
     }, [quizData.length])
 
+    // [수정] 주관식용 핸들러 추가
+    const handleShowAnswer = () => {
+        setShowAnswer(true)
+    }
+
+    const handleKnow = () => {
+        goToNextQuestion()
+    }
+
+    const handleDontKnow = useCallback(() => {
+        const q = quizData[current]
+        if (q) {
+            setWrongSet((prev) =>
+                prev.some((x) => x.question === q.question) ? prev : [...prev, q]
+            )
+        }
+        goToNextQuestion()
+    }, [current, goToNextQuestion, quizData])
+
+    // 객관식용 핸들러
     const handleOptionSelect = useCallback(
         (option: string) => {
             if (showAnswer) {
@@ -145,31 +169,30 @@ export default function QuizPage() {
         }
     }, [isMultiAnswerQuestion, selectedOptions, correctAnswersArray, quizData, current])
 
-    const handleDontKnow = useCallback(() => {
-        const q = quizData[current]
-        setWrongSet((prev) =>
-            prev.some((x) => x.question === q.question) ? prev : [...prev, q]
-        )
-        goToNextQuestion()
-    }, [current, goToNextQuestion, quizData])
-
+    // [수정] 키보드 이벤트 핸들러 (주관식용 로직 추가)
     useEffect(() => {
-        if (phase !== "learn") return
+        if (phase !== "learn" || !currentQA) return
+
+        const isMultipleChoice = !!currentQA.options
+
         const onKey = (e: KeyboardEvent) => {
-            const qa = quizData[current]
-            const isMultipleChoice = qa.options && qa.options.length > 0
-            if (isMultipleChoice) return
+            if (isMultipleChoice) return // 객관식일때는 키보드 이벤트 무시
+
             if (!showAnswer) {
-                setShowAnswer(true)
+                if (e.key === " " || e.key === "Enter") { // 스페이스바나 엔터로 정답 보기
+                    e.preventDefault()
+                    setShowAnswer(true)
+                }
             } else {
-                if (e.key === "ArrowRight") goToNextQuestion()
-                else if (e.key === "ArrowLeft") handleDontKnow()
+                if (e.key === "ArrowRight") handleKnow() // 오른쪽 화살표: 알아요
+                else if (e.key === "ArrowLeft") handleDontKnow() // 왼쪽 화살표: 몰라요
             }
         }
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
-    }, [phase, showAnswer, goToNextQuestion, handleDontKnow, quizData, current])
+    }, [phase, showAnswer, currentQA, handleKnow, handleDontKnow])
 
+    // --- 결과 처리 함수 ---
     const retryWrongSet = () => {
         if (!wrongSet.length) return
         setQuizData(shuffle(wrongSet))
@@ -208,6 +231,10 @@ export default function QuizPage() {
                 onOptionSelect={handleOptionSelect}
                 onGoToNext={goToNextQuestion}
                 onCheckAnswers={handleCheckAnswers}
+                // 주관식용 핸들러 전달
+                onShowAnswer={handleShowAnswer}
+                onKnow={handleKnow}
+                onDontKnow={handleDontKnow}
             />
         )
     }
@@ -231,16 +258,6 @@ export default function QuizPage() {
                                         {wrongSet.map((q, i) => (
                                             <li key={i} className="text-lg md:text-xl">
                                                 <div className="font-semibold mb-1">Q. {q.question}</div>
-                                                {q.options && q.options.length > 0 && (
-                                                    <div className="text-base text-gray-600">
-                                                        <p className="font-medium">선지:</p>
-                                                        <ul className="list-disc list-inside ml-2">
-                                                            {q.options.map((opt, optIdx) => (
-                                                                <li key={optIdx}>{opt}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
                                                 <div className="text-green-600">A. {q.answer}</div>
                                             </li>
                                         ))}
