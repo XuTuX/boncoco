@@ -12,6 +12,8 @@ import { moderntest } from "./moderntest";
 import { bonconum } from "./bonconum";
 import { anatomtest } from "./anatomtest";
 import { acupunctureQuiz } from "./acupunctureQuiz";
+import { immunologyFinals } from "./immunologyFinals";
+
 
 
 
@@ -31,5 +33,6 @@ export const quizByCategory: {
     본초_객관식: bonconum,
     해부_단답: anatomtest,
     경혈: acupunctureQuiz,
+    면역: immunologyFinals
 
 };
